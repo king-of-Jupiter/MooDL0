@@ -13,7 +13,7 @@ function env(name, fallback = '') {
 const config = {
   openeduApiBaseUrl: env('OPENEDU_API_BASE_URL', 'https://paramext.ruka.me/api'),
   moodleApiBaseUrl: env('MOODLE_API_BASE_URL', 'https://syncshare.naloaty.me/api'),
-  botLink: env('BOT_LINK', 'https://t.me/paramext_bot'),
+  botLink: env('BOT_LINK', ''),
   telegramChannelLink: env('TELEGRAM_CHANNEL_LINK', 'https://t.me/moodush_news'),
   repositoryUrl: env('REPOSITORY_URL', env('GITHUB_SERVER_URL') && env('GITHUB_REPOSITORY')
     ? `${env('GITHUB_SERVER_URL')}/${env('GITHUB_REPOSITORY')}`

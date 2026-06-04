@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupScreen: $('setupScreen'),
         setupBackBtn: $('setupBackBtn'),
         setupContinueBtn: $('setupContinueBtn'),
+        setupMoodleOnlyBtn: $('setupMoodleOnlyBtn'),
+        setupDescription: $('setupDescription'),
         appScreen: $('appScreen'),
         botLink: $('botLink'),
         customBackendToggle: $('customBackendToggle'),
@@ -80,11 +82,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     let settings = await settingsApi.getSettings();
     let setupOpenedFromApp = false;
     let saveTimer = 0;
+    let startupEventsReported = false;
 
     refs.versionPill.textContent = 'v' + (manifest.version || 'unknown');
     refs.buildStatus.textContent = String(buildConfig.buildChannel || 'local') + ' / ' + String(buildConfig.buildId || 'local-dev').slice(0, 8);
-    refs.telegramChannelLink.href = buildConfig.telegramChannelLink || buildConfig.telegramLink || buildConfig.botLink || 'https://t.me/paramext_bot';
-    refs.botLink.href = buildConfig.botLink || 'https://t.me/paramext_bot';
+    const configuredBotLink = String(buildConfig.botLink || '').trim();
+    const configuredTelegramChannelLink = String(buildConfig.telegramChannelLink || buildConfig.telegramLink || '').trim();
+    refs.telegramChannelLink.href = configuredTelegramChannelLink || '#';
+    refs.telegramChannelLink.classList.toggle('hidden', !configuredTelegramChannelLink);
+    refs.botLink.href = configuredBotLink || '#';
+    refs.botLink.classList.toggle('hidden', !configuredBotLink);
     refs.mainLogo?.addEventListener('error', () => {
         refs.mainLogo.src = '../../logo_main.png';
     });
@@ -95,6 +102,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function endpointPrefix() {
         return (refs.openeduBackendVersion.value || settings.openedu.backendVersion || 'v2') === 'v1' ? '/v1' : '/v2';
+    }
+
+    function isMoodleOnlyMode() {
+        return Boolean(settings.onboarding?.moodleOnly && !settings.backend?.openedu?.apiToken);
+    }
+
+    function getVisibleTab(name) {
+        const preferred = ['openedu', 'moodle', 'stats', 'diagnostics'].includes(name) ? name : 'openedu';
+        if (isMoodleOnlyMode() && (preferred === 'openedu' || preferred === 'stats')) {
+            return 'moodle';
+        }
+        return preferred;
     }
 
     function setRadio(name, value) {
@@ -131,29 +150,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         refs.setupBackBtn.classList.toggle('hidden', !setupOpenedFromApp);
         refs.headerStatus.textContent = name === 'privacy'
             ? 'Нужно согласие'
-            : (name === 'setup' ? 'Нужно подключение' : 'Готово к работе');
+            : (name === 'setup' ? (isMoodleOnlyMode() ? 'Подключение OpenEdu' : 'Нужно подключение') : 'Готово к работе');
     }
 
     function route() {
         const accepted = Boolean(settings.onboarding?.privacyAccepted);
         const hasToken = Boolean(settings.backend?.openedu?.apiToken);
+        const moodleOnly = Boolean(settings.onboarding?.moodleOnly);
         if (!accepted) {
             showScreen('privacy');
-        } else if (!hasToken || setupOpenedFromApp) {
+        } else if ((!hasToken && !moodleOnly) || setupOpenedFromApp) {
             showScreen('setup');
         } else {
             showScreen('app');
         }
     }
 
-    function setTab(name) {
+    function setTab(name, persist) {
+        const visibleName = getVisibleTab(name);
         document.querySelectorAll('.tab').forEach((tab) => {
-            tab.classList.toggle('active', tab.dataset.tab === name);
+            tab.classList.toggle('active', tab.dataset.tab === visibleName);
         });
-        refs.openeduSettings.classList.toggle('hidden', name !== 'openedu');
-        refs.moodleSettings.classList.toggle('hidden', name !== 'moodle');
-        refs.statsPanel.classList.toggle('hidden', name !== 'stats');
-        refs.diagnosticsPanel.classList.toggle('hidden', name !== 'diagnostics');
+        refs.openeduSettings.classList.toggle('hidden', visibleName !== 'openedu');
+        refs.moodleSettings.classList.toggle('hidden', visibleName !== 'moodle');
+        refs.statsPanel.classList.toggle('hidden', visibleName !== 'stats');
+        refs.diagnosticsPanel.classList.toggle('hidden', visibleName !== 'diagnostics');
+        settings.ui = settings.ui || {};
+        settings.ui.lastTab = visibleName;
+        if (persist) {
+            scheduleAppSave('last-tab');
+        }
     }
 
     function updateModeVisibility() {
@@ -216,19 +242,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         refs.openeduMissingAnswerAction.value = settings.openedu.missingAnswerAction;
         refs.openeduAutoAdvanceDelayMs.value = String(settings.openedu.autoAdvanceDelayMs);
         refs.openeduDebugOverlay.checked = Boolean(settings.diagnostics?.openeduDebugOverlay);
-        refs.platformOpenedu.classList.toggle('active', settings.activePlatform === 'openedu');
-        refs.platformMoodle.classList.toggle('active', settings.activePlatform === 'moodle');
-        refs.platformOpenedu.textContent = settings.activePlatform === 'openedu' ? 'Активно' : 'Сделать активным';
-        refs.platformMoodle.textContent = settings.activePlatform === 'moodle' ? 'Активно' : 'Сделать активным';
+        const moodleOnly = isMoodleOnlyMode();
+        const activePlatform = moodleOnly ? 'moodle' : settings.activePlatform;
+        refs.platformOpenedu.classList.toggle('active', activePlatform === 'openedu');
+        refs.platformMoodle.classList.toggle('active', activePlatform === 'moodle');
+        refs.platformOpenedu.textContent = activePlatform === 'openedu' ? 'Активно' : 'Сделать активным';
+        refs.platformMoodle.textContent = activePlatform === 'moodle' ? 'Активно' : 'Сделать активным';
+        document.querySelectorAll('.tab[data-tab="openedu"], .tab[data-tab="stats"]').forEach((tab) => {
+            tab.classList.toggle('hidden', moodleOnly);
+        });
+        refs.setupDescription.textContent = moodleOnly
+            ? 'Moodle уже доступен без Telegram-ключа. Чтобы вернуть OpenEdu, получите ключ у бота и подключите его здесь.'
+            : 'Откройте бота, получите персональный ключ и вставьте его ниже. Если нужен только Moodle, этот шаг можно пропустить.';
+        refs.setupContinueBtn.textContent = moodleOnly ? 'Проверить и подключить OpenEdu' : 'Проверить и продолжить';
+        refs.setupMoodleOnlyBtn.textContent = moodleOnly ? 'Оставаться только с Moodle' : 'Использовать только Moodle';
+        refs.setupMoodleOnlyBtn.classList.toggle('hidden', Boolean(refs.backendApiToken.value.trim()));
         updateModeVisibility();
+        setTab(settings.ui?.lastTab || settings.activePlatform || 'openedu', false);
         route();
     }
 
     function collectStateFromUi() {
         const next = JSON.parse(JSON.stringify(settings));
-        next.activePlatform = refs.platformMoodle.classList.contains('active') ? 'moodle' : 'openedu';
+        next.ui = next.ui || {};
+        next.ui.lastTab = getVisibleTab(next.ui.lastTab || 'openedu');
+        next.activePlatform = isMoodleOnlyMode() ? 'moodle' : (refs.platformMoodle.classList.contains('active') ? 'moodle' : 'openedu');
         next.onboarding.privacyAccepted = Boolean(next.onboarding.privacyAccepted);
-        next.onboarding.completed = Boolean(next.onboarding.privacyAccepted && refs.backendApiToken.value.trim());
+        next.onboarding.moodleOnly = Boolean(next.onboarding.moodleOnly && !refs.backendApiToken.value.trim());
+        next.onboarding.completed = Boolean(next.onboarding.privacyAccepted && (next.onboarding.moodleOnly || refs.backendApiToken.value.trim()));
 
         next.backend.openedu.apiBaseUrl = refs.customBackendToggle.checked
             ? refs.backendApiBaseUrl.value.trim().replace(/\/$/, '')
@@ -260,14 +301,85 @@ document.addEventListener('DOMContentLoaded', async () => {
         return settingsApi.normalizeSettings(next);
     }
 
-    async function save(reason, stayOnSetup) {
-        settings = collectStateFromUi();
+    async function persistSettings(next, reason) {
+        settings = settingsApi.normalizeSettings(next);
         settings = await settingsApi.saveSettings(settings);
         sendToActiveTab({ type: 'SETTINGS_UPDATED', settings, reason: reason || 'popup' });
+        applyStateToUi();
+    }
+
+    async function save(reason, stayOnSetup) {
+        settings = collectStateFromUi();
         if (!stayOnSetup) {
             setupOpenedFromApp = false;
         }
-        applyStateToUi();
+        await persistSettings(settings, reason);
+    }
+
+    function telemetryAllowed() {
+        return Boolean(settings.onboarding?.privacyAccepted && settings.onboarding?.allowTechnicalDataCollection !== false);
+    }
+
+    function eventStorageKey(name) {
+        return 'paramExtExtensionEvent:' + name;
+    }
+
+    async function reportExtensionEvent(eventName, onceKey) {
+        if (!telemetryAllowed()) {
+            return;
+        }
+        try {
+            if (onceKey && localStorage.getItem(eventStorageKey(onceKey))) {
+                return;
+            }
+        } catch (_) {
+            return;
+        }
+
+        const baseUrl = normalizeUrl(settings.backend?.openedu?.apiBaseUrl || defaultOpeneduUrl());
+        if (!baseUrl) {
+            return;
+        }
+
+        const payload = {
+            eventName,
+            extensionVersion: manifest.version || 'unknown',
+            buildId: String(buildConfig.buildId || 'local-dev'),
+            channel: String(buildConfig.buildChannel || 'local'),
+            platform: isMoodleOnlyMode() ? 'moodle' : String(settings.activePlatform || 'openedu'),
+            authMode: settings.backend?.openedu?.apiToken ? 'openedu-token' : (isMoodleOnlyMode() ? 'moodle-only' : 'anonymous')
+        };
+
+        try {
+            const response = await fetch(baseUrl + '/v2/extension/events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                cache: 'no-store'
+            });
+            if (response.ok && onceKey) {
+                localStorage.setItem(eventStorageKey(onceKey), new Date().toISOString());
+            }
+        } catch (_) {
+            // Anonymous counters are best-effort only.
+        }
+    }
+
+    function normalizeUrl(value) {
+        return String(value || '').trim().replace(/\/$/, '');
+    }
+
+    function reportStartupEvents() {
+        if (!telemetryAllowed()) {
+            return;
+        }
+        if (startupEventsReported) {
+            return;
+        }
+        startupEventsReported = true;
+        const today = new Date().toISOString().slice(0, 10);
+        reportExtensionEvent('extension_installed', 'install-v1');
+        reportExtensionEvent('popup_opened', 'popup-opened-' + today);
     }
 
     function scheduleAppSave(reason) {
@@ -436,10 +548,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!ok) {
             return;
         }
-        await save('setup-continue', false);
+        const next = collectStateFromUi();
+        next.onboarding.moodleOnly = false;
+        next.onboarding.completed = true;
+        next.activePlatform = 'openedu';
+        next.ui = next.ui || {};
+        next.ui.lastTab = 'openedu';
+        setupOpenedFromApp = false;
+        await persistSettings(next, 'setup-continue');
+        reportExtensionEvent('openedu_connected', 'openedu-connected-v1');
+    });
+    refs.setupMoodleOnlyBtn.addEventListener('click', async () => {
+        const next = collectStateFromUi();
+        next.onboarding.moodleOnly = true;
+        next.onboarding.completed = Boolean(next.onboarding.privacyAccepted);
+        next.activePlatform = 'moodle';
+        next.ui = next.ui || {};
+        next.ui.lastTab = 'moodle';
+        setupOpenedFromApp = false;
+        await persistSettings(next, 'setup-moodle-only');
+        reportExtensionEvent('moodle_only_enabled', 'moodle-only-v1');
     });
 
-    document.querySelectorAll('.tab').forEach((tab) => tab.addEventListener('click', () => setTab(tab.dataset.tab)));
+    document.querySelectorAll('.tab').forEach((tab) => tab.addEventListener('click', () => setTab(tab.dataset.tab, true)));
     refs.customBackendToggle.addEventListener('change', () => {
         if (!refs.customBackendToggle.checked) {
             refs.backendApiBaseUrl.value = defaultOpeneduUrl();
@@ -459,6 +590,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (refs.customBackendToggle.checked && settings.backend?.openedu?.apiToken) {
             scheduleSetupSave('backend-url');
         }
+    });
+    refs.backendApiToken.addEventListener('input', () => {
+        refs.setupMoodleOnlyBtn.classList.toggle('hidden', Boolean(refs.backendApiToken.value.trim()));
     });
     refs.backendRequestTimeoutMs.addEventListener('input', () => {
         if (settings.backend?.openedu?.apiToken) {
@@ -531,6 +665,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     bindHotkey(refs.openeduHotkey);
 
     applyStateToUi();
+    reportStartupEvents();
     refreshProjectVersion();
     pingBackend();
     checkUpdate();

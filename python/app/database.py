@@ -693,6 +693,19 @@ class Database:
                     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
                 );
 
+                CREATE TABLE IF NOT EXISTS extension_event_counters (
+                    event_date DATE NOT NULL DEFAULT CURRENT_DATE,
+                    event_name TEXT NOT NULL,
+                    extension_version TEXT NOT NULL DEFAULT '',
+                    build_id TEXT NOT NULL DEFAULT '',
+                    channel TEXT NOT NULL DEFAULT '',
+                    platform TEXT NOT NULL DEFAULT '',
+                    auth_mode TEXT NOT NULL DEFAULT '',
+                    count BIGINT NOT NULL DEFAULT 0,
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    PRIMARY KEY (event_date, event_name, extension_version, build_id, channel, platform, auth_mode)
+                );
+
                 CREATE INDEX IF NOT EXISTS idx_openedu_v2_tests_course ON openedu_v2_tests (course_id, chapter_id, sequential_id, vertical_id);
                 CREATE INDEX IF NOT EXISTS idx_openedu_v2_questions_course ON openedu_v2_questions (course_id, chapter_id, sequential_id, vertical_id);
                 CREATE INDEX IF NOT EXISTS idx_openedu_v2_questions_fingerprint ON openedu_v2_questions (test_key, question_fingerprint) WHERE question_fingerprint != '';
@@ -704,6 +717,7 @@ class Database:
                 CREATE INDEX IF NOT EXISTS idx_openedu_v2_courses_updated ON openedu_v2_courses (updated_at DESC);
                 CREATE INDEX IF NOT EXISTS idx_client_logs_user_created ON client_logs (user_id, created_at DESC);
                 CREATE INDEX IF NOT EXISTS idx_client_logs_kind_created ON client_logs (kind, created_at DESC);
+                CREATE INDEX IF NOT EXISTS idx_extension_event_counters_event_date ON extension_event_counters (event_name, event_date DESC);
                 """
             )
 
@@ -2218,6 +2232,27 @@ class Database:
                 self._safe_json(system),
             )
 
+    async def record_extension_event(self, payload: dict[str, Any]) -> None:
+        assert self.pool is not None
+        async with self.pool.acquire() as conn:
+            await conn.execute(
+                """
+                INSERT INTO extension_event_counters
+                    (event_date, event_name, extension_version, build_id, channel, platform, auth_mode, count, updated_at)
+                VALUES
+                    (CURRENT_DATE, $1, $2, $3, $4, $5, $6, 1, NOW())
+                ON CONFLICT (event_date, event_name, extension_version, build_id, channel, platform, auth_mode)
+                DO UPDATE SET count = extension_event_counters.count + 1,
+                              updated_at = NOW()
+                """,
+                str(payload.get('eventName') or ''),
+                str(payload.get('extensionVersion') or ''),
+                str(payload.get('buildId') or ''),
+                str(payload.get('channel') or ''),
+                str(payload.get('platform') or ''),
+                str(payload.get('authMode') or ''),
+            )
+
     async def get_user_public_stats(self, user_id: int | None) -> dict[str, Any]:
         assert self.pool is not None
         if user_id is None:
@@ -2597,7 +2632,11 @@ class Database:
                     (SELECT COUNT(*) FROM openedu_v2_tests) AS v2_tests_count,
                     (SELECT COUNT(*) FROM openedu_v2_questions) AS v2_questions_count,
                     (SELECT COUNT(*) FROM openedu_v2_attempts) AS v2_attempts_count,
-                    (SELECT COUNT(*) FROM openedu_v2_parse_reports) AS v2_parse_reports_count
+                    (SELECT COUNT(*) FROM openedu_v2_parse_reports) AS v2_parse_reports_count,
+                    (SELECT COALESCE(SUM(count), 0) FROM extension_event_counters WHERE event_name = 'extension_installed') AS extension_installs_count,
+                    (SELECT COALESCE(SUM(count), 0) FROM extension_event_counters WHERE event_name = 'extension_installed' AND auth_mode IN ('anonymous', 'moodle-only')) AS anonymous_extension_installs_count,
+                    (SELECT COALESCE(SUM(count), 0) FROM extension_event_counters WHERE event_name = 'moodle_only_enabled') AS moodle_only_count,
+                    (SELECT COALESCE(SUM(count), 0) FROM extension_event_counters WHERE event_name = 'popup_opened' AND event_date = CURRENT_DATE) AS popup_opens_today
                 """
             )
             top_tests = await conn.fetch(

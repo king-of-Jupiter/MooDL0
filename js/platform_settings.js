@@ -23,7 +23,11 @@
         onboarding: {
             privacyAccepted: false,
             allowTechnicalDataCollection: true,
-            completed: false
+            completed: false,
+            moodleOnly: false
+        },
+        ui: {
+            lastTab: 'openedu'
         },
         moodle: {
             mode: 'wand',
@@ -157,6 +161,13 @@
             next.onboarding.privacyAccepted = Boolean(source.onboarding.privacyAccepted);
             next.onboarding.allowTechnicalDataCollection = source.onboarding.allowTechnicalDataCollection !== false;
             next.onboarding.completed = Boolean(source.onboarding.completed);
+            next.onboarding.moodleOnly = Boolean(source.onboarding.moodleOnly);
+        }
+
+        if (source.ui && typeof source.ui === 'object') {
+            if (['openedu', 'moodle', 'stats', 'diagnostics'].includes(source.ui.lastTab)) {
+                next.ui.lastTab = source.ui.lastTab;
+            }
         }
 
         if (source.diagnostics && typeof source.diagnostics === 'object') {
@@ -175,6 +186,12 @@
             && next.backend.openedu.apiBaseUrl === defaultMoodleUrl
         ) {
             next.backend.openedu.apiBaseUrl = defaultOpeneduUrl;
+        }
+        if (next.onboarding.moodleOnly && !next.backend.openedu.apiToken) {
+            next.activePlatform = 'moodle';
+            if (next.ui.lastTab === 'openedu') {
+                next.ui.lastTab = 'moodle';
+            }
         }
 
         return next;
@@ -253,6 +270,7 @@
             migrated.onboarding.privacyAccepted = Boolean(legacy.privacyPolicyAcceptedByUser);
             migrated.onboarding.allowTechnicalDataCollection = legacy.allowTechnicalDataCollection !== false;
             migrated.onboarding.completed = Boolean(legacy.privacyPolicyAcceptedByUser && legacy.backend?.apiToken);
+            migrated.onboarding.moodleOnly = false;
             if (legacy.backend && typeof legacy.backend === 'object') {
                 if (typeof legacy.backend.apiBaseUrl === 'string' && legacy.backend.apiBaseUrl.trim().length > 0) {
                     const normalizedUrl = legacy.backend.apiBaseUrl.trim().replace(/\/$/, '');

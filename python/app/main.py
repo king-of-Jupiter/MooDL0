@@ -13,6 +13,7 @@ from .bot import start_bot, stop_bot
 from .config import settings
 from .database import database
 from .schemas import (
+    ExtensionEventIn,
     LogPayloadIn,
     LogPayloadV2In,
     OpenEduAttemptIn,
@@ -252,6 +253,13 @@ async def post_openedu_v2_query(payload: OpenEduV2SolutionsQueryIn, user_id: Opt
 @app.get('/api/v2/users/me/stats')
 async def get_v2_me_stats(user_id: Optional[int] = Depends(require_api_token)) -> dict:
     return {'ok': True, 'stats': await database.get_user_public_stats(user_id)}
+
+
+@app.post('/v2/extension/events')
+@app.post('/api/v2/extension/events')
+async def post_extension_event(payload: ExtensionEventIn) -> dict:
+    await database.record_extension_event(payload.model_dump())
+    return {'ok': True}
 
 
 # ── Client logs (DB write retired, Telegram forwarding kept) ───────

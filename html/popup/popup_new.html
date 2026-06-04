@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="header-actions">
-                <a href="https://t.me/moodush_news" id="telegramChannelLink" class="icon-btn telegram-btn" target="_blank" rel="noopener" title="Telegram-канал MooDuSh" aria-label="Telegram-канал MooDuSh">
+                <a href="#" id="telegramChannelLink" class="icon-btn telegram-btn" target="_blank" rel="noopener" title="Telegram-канал MooDuSh" aria-label="Telegram-канал MooDuSh">
                     <img src="../../icons/telegram.png" alt="">
                 </a>
                 <button type="button" id="openSetupBtn" class="icon-btn" title="Подключение и backend">⚙</button>
@@ -42,7 +42,7 @@
             <div class="screen-copy">
                 <span class="screen-kicker">Подключение</span>
                 <h2>Войдите через Telegram-ключ</h2>
-                <p>Откройте бота, получите персональный ключ и вставьте его ниже. Изменения применяются только по кнопке продолжения.</p>
+                <p id="setupDescription">Откройте бота, получите персональный ключ и вставьте его ниже. Если нужен только Moodle, этот шаг можно пропустить.</p>
             </div>
             <a id="botLink" href="#" target="_blank" class="bot-link">Открыть Telegram-бота</a>
             <label class="field">
@@ -74,6 +74,7 @@
             <div class="screen-actions">
                 <button type="button" id="setupBackBtn" class="btn btn-outline-secondary w-100 hidden">Назад</button>
                 <button type="button" id="setupContinueBtn" class="btn btn-dark w-100">Проверить и продолжить</button>
+                <button type="button" id="setupMoodleOnlyBtn" class="btn btn-outline-dark w-100">Использовать только Moodle</button>
             </div>
         </section>
 

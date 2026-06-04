@@ -25,7 +25,11 @@
             onboarding: {
                 privacyAccepted: false,
                 allowTechnicalDataCollection: true,
-                completed: false
+                completed: false,
+                moodleOnly: false
+            },
+            ui: {
+                lastTab: 'openedu'
             },
             moodle: {
                 mode: 'wand',
@@ -62,7 +66,10 @@
             privacyAccepted: true,
             allowTechnicalDataCollection: document.getElementById('technicalConsent')?.checked !== false
         });
-        settings.onboarding.completed = Boolean(settings.onboarding.privacyAccepted && settings.backend?.openedu?.apiToken);
+        settings.onboarding.completed = Boolean(
+            settings.onboarding.privacyAccepted
+            && (settings.onboarding.moodleOnly || settings.backend?.openedu?.apiToken)
+        );
 
         const legacy = Object.assign({}, payload[LEGACY_KEY] || {}, {
             privacyPolicyAcceptedByUser: true,

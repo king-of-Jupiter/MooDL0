@@ -142,3 +142,12 @@ class LogPayloadV2In(BaseModel):
         if len(str(value)) > 20000:
             return {'truncated': True, 'preview': str(value)[:2000]}
         return value
+
+
+class ExtensionEventIn(BaseModel):
+    eventName: Literal['extension_installed', 'popup_opened', 'moodle_only_enabled', 'openedu_connected']
+    extensionVersion: str = Field(default='unknown', max_length=32)
+    buildId: str = Field(default='', max_length=96)
+    channel: str = Field(default='local', max_length=32)
+    platform: Literal['openedu', 'moodle', 'unknown'] = 'unknown'
+    authMode: Literal['anonymous', 'moodle-only', 'openedu-token'] = 'anonymous'
