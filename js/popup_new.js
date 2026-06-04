@@ -83,8 +83,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     refs.versionPill.textContent = 'v' + (manifest.version || 'unknown');
     refs.buildStatus.textContent = String(buildConfig.buildChannel || 'local') + ' / ' + String(buildConfig.buildId || 'local-dev').slice(0, 8);
-    refs.telegramChannelLink.href = buildConfig.telegramChannelLink || buildConfig.telegramLink || buildConfig.botLink || 'https://t.me/moodush_bot';
-    refs.botLink.href = buildConfig.botLink || 'https://t.me/moodush_bot';
+    refs.telegramChannelLink.href = buildConfig.telegramChannelLink || buildConfig.telegramLink || buildConfig.botLink || 'https://t.me/paramext_bot';
+    refs.botLink.href = buildConfig.botLink || 'https://t.me/paramext_bot';
     refs.mainLogo?.addEventListener('error', () => {
         refs.mainLogo.src = '../../logo_main.png';
     });

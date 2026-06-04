@@ -148,7 +148,7 @@ API_TOKEN=change_me_api_token
 ADMIN_TOKEN=change_me_admin_password
 ADMIN_SECRET_KEY=change_me_long_random_secret
 TELEGRAM_BOT_TOKEN=123456:telegram_bot_token
-BOT_LINK=https://t.me/moodush_bot
+BOT_LINK=https://t.me/paramext_bot
 ```
 
 
@@ -164,7 +164,7 @@ Workflow `.github/workflows/extension.yml` гоняет тесты, собира
 |----------|--------|------------|
 | `OPENEDU_API_BASE_URL` | `https://paramext.ruka.me/api` | Публичный URL OpenEdu backend для popup/build config |
 | `MOODLE_API_BASE_URL` | `https://syncshare.naloaty.me/api` | Публичный URL Moodle backend |
-| `BOT_LINK` | `https://t.me/moodush_bot` | Ссылка на Telegram-бота для получения ключа |
+| `BOT_LINK` | `https://t.me/paramext_bot` | Ссылка на Telegram-бота для получения ключа |
 | `UPDATE_CHECK_URL` | `https://paramext.ruka.me/api/v2/update` | Endpoint проверки обновлений |
 | `RELEASE_PUBLIC_KEY` | публичный PEM/ключ | Публичный ключ проверки release manifest |
 
@@ -240,7 +240,7 @@ MooDuSh/
 ## FAQ
 
 **В: Расширение не показывает ответы на OpenEdu**  
-О: Проверьте, что вы зарегистрированы в [@moodush_bot](https://t.me/moodush_bot), токен вставлен в настройках API, и статус API — «Онлайн».
+О: Проверьте, что вы зарегистрированы в [@paramext_bot](https://t.me/paramext_bot), токен вставлен в настройках API, и статус API — «Онлайн».
 
 **В: Кнопки палочки не появляются**  
 О: Убедитесь, что вы находитесь на странице теста. Попробуйте обновить страницу. Проверьте, что палочка не скрыта горячей клавишей.
