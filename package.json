@@ -1,6 +1,6 @@
 {
   "name": "moodl0-extension",
-  "version": "2.9.6",
+  "version": "3.2.0",
   "private": true,
   "scripts": {
     "test": "node -e \"console.log('no tests: Moodle-only build')\"",
