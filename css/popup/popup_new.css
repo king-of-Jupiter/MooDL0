@@ -355,6 +355,10 @@ body {
     flex-wrap: wrap;
 }
 
+.action-row + .action-row {
+    margin-top: 7px;
+}
+
 .bot-link {
     display: inline-flex;
     width: max-content;
