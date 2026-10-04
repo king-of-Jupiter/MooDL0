@@ -52,6 +52,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         moodleAutoInsertOnLoad: $('moodleAutoInsertOnLoad'),
         moodleInsertKey: $('moodleInsertKey'),
         nextBtnSelector: $('nextBtnSelector'),
+        moodleAutoFinishAttempt: $('moodleAutoFinishAttempt'),
+        moodleAutoFinishRow: $('moodleAutoFinishRow'),
+        moodleAutoSubmitAttempt: $('moodleAutoSubmitAttempt'),
+        moodleAutoSubmitRow: $('moodleAutoSubmitRow'),
+        moodleQueueFile: $('moodleQueueFile'),
+        moodleQueueStart: $('moodleQueueStart'),
+        moodleQueueStop: $('moodleQueueStop'),
+        moodleQueueStatus: $('moodleQueueStatus'),
         openeduHotkey: $('openeduHotkey'),
         openeduStickOptions: $('openeduStickOptions'),
         openeduAssistOptions: $('openeduAssistOptions'),
@@ -190,6 +198,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         refs.openeduAutoOptions.classList.toggle('hidden', openeduMode !== 'autoSolve');
         refs.requiredCompletionRow.classList.toggle('hidden', !refs.openeduAutoAdvanceEnabled.checked);
         refs.autoSolveControls.classList.toggle('hidden', moodleMode !== 'autoSolve');
+        refs.moodleAutoFinishRow.classList.toggle('hidden', moodleMode !== 'autoSolve');
+        refs.moodleAutoSubmitRow.classList.toggle('hidden', moodleMode !== 'autoSolve' || !refs.moodleAutoFinishAttempt.checked);
         refs.btnStart.classList.toggle('hidden', Boolean(settings.moodle.autoSolving));
         refs.btnStop.classList.toggle('hidden', !settings.moodle.autoSolving);
     }
@@ -230,6 +240,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         refs.moodleAutoInsertOnLoad.checked = settings.moodle.autoInsertOnLoad !== false;
         refs.moodleInsertKey.value = settings.moodle.insertHotkey;
         refs.nextBtnSelector.value = settings.moodle.nextButtonText;
+        refs.moodleAutoFinishAttempt.checked = Boolean(settings.moodle.autoFinishAttempt);
+        refs.moodleAutoSubmitAttempt.checked = Boolean(settings.moodle.autoSubmitAttempt);
         refs.openeduHotkey.value = settings.openedu.stickHotkey;
         refs.openeduAutoAdvanceEnabled.checked = settings.openedu.autoAdvanceEnabled;
         refs.openeduRequiredCompletionOnly.checked = settings.openedu.requiredCompletionOnly;
@@ -283,6 +295,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         next.moodle.autoInsertOnLoad = refs.moodleAutoInsertOnLoad.checked;
         next.moodle.insertHotkey = refs.moodleInsertKey.value.trim() || next.moodle.insertHotkey;
         next.moodle.nextButtonText = refs.nextBtnSelector.value.trim() || next.moodle.nextButtonText;
+        next.moodle.autoFinishAttempt = refs.moodleAutoFinishAttempt.checked;
+        next.moodle.autoSubmitAttempt = refs.moodleAutoSubmitAttempt.checked;
 
         next.openedu.mode = radioValue('openeduMode', next.openedu.mode);
         next.openedu.stickHotkey = refs.openeduHotkey.value.trim() || next.openedu.stickHotkey;
@@ -632,9 +646,89 @@ document.addEventListener('DOMContentLoaded', async () => {
         sendToActiveTab({ type: 'STOP_AUTO_SOLVE' });
     });
 
+    async function showMoodleQueueStatus() {
+        const result = await chrome.storage.local.get('paramExtMoodleQueue');
+        const queue = result.paramExtMoodleQueue;
+        const stages = { view: 'открываем тест', starting: 'запускаем попытку', attempt: 'решаем вопросы', submitted: 'ожидаем результат' };
+        refs.moodleQueueStatus.textContent = queue?.active
+            ? `Тест ${queue.index + 1} из ${queue.links.length} — ${stages[queue.stage] || 'ожидаем'}: ${queue.links[queue.index]}`
+            : (queue?.error || (!queue ? 'Очередь не запущена' : (queue.index === queue.links.length ? `Готово: ${queue.index} из ${queue.links.length}` : 'Очередь остановлена')));
+    }
+
+    refs.moodleQueueStart.addEventListener('click', async () => {
+        const file = refs.moodleQueueFile.files?.[0];
+        if (!file || !/\.txt$/i.test(file.name)) {
+            refs.moodleQueueStatus.textContent = 'Выберите файл .txt';
+            return;
+        }
+        const lines = (await file.text()).split(/\r?\n/).map((line) => line.trim())
+            .filter((line) => line && !line.startsWith('#'));
+        let links;
+        try {
+            links = lines.map((line) => {
+                const url = new URL(line);
+                if (!/^https?:$/.test(url.protocol) || !/\/mod\/quiz\/view\.php$/.test(url.pathname)
+                    || !/^\d+$/.test(url.searchParams.get('id') || '')) {
+                    throw new Error('Некорректная ссылка: ' + line);
+                }
+                return url.href;
+            });
+            if (!links.length || !links.every((url) => new URL(url).origin === new URL(links[0]).origin)) {
+                throw new Error('Нужны ссылки на тесты одного сайта, по одной на строку.');
+            }
+        } catch (error) {
+            refs.moodleQueueStatus.textContent = error.message;
+            return;
+        }
+        if (saveTimer) {
+            clearTimeout(saveTimer);
+            saveTimer = 0;
+        }
+        await save('moodle-queue-start', false);
+        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (!tabs[0]?.id) {
+            refs.moodleQueueStatus.textContent = 'Не найдена активная вкладка';
+            return;
+        }
+        try {
+            const key = 'paramExtMoodleQueue';
+            const previous = (await chrome.storage.local.get(key))[key];
+            if (previous?.active && (previous.tabId !== tabs[0].id || previous.attemptId || previous.stage === 'submitted')) {
+                refs.moodleQueueStatus.textContent = 'Очередь уже обрабатывает попытку. Остановите её перед новым запуском.';
+                return;
+            }
+            const launchToken = crypto.randomUUID();
+            const queue = { active: true, tabId: tabs[0].id, links, index: 0, attemptId: null,
+                stage: 'view', origin: new URL(links[0]).origin, launchToken, error: '' };
+            await chrome.storage.local.set({ [key]: queue });
+            refs.moodleQueueStatus.textContent = `Запущено: 1 из ${links.length}`;
+            const destination = new URL(links[0]);
+            destination.hash = 'moodush-queue=' + launchToken;
+            await chrome.tabs.update(queue.tabId, { url: destination.href, active: true });
+        } catch (error) {
+            const key = 'paramExtMoodleQueue';
+            const queue = (await chrome.storage.local.get(key))[key];
+            if (queue?.active && queue.tabId === tabs[0].id && queue.links[0] === links[0]) {
+                await chrome.storage.local.set({ [key]: { ...queue, active: false, error: String(error.message || error) } });
+            }
+            refs.moodleQueueStatus.textContent = error.message || 'Не удалось открыть тест';
+        }
+    });
+    refs.moodleQueueStop.addEventListener('click', async () => {
+        const key = 'paramExtMoodleQueue';
+        const queue = (await chrome.storage.local.get(key))[key];
+        if (queue?.active) {
+            await chrome.storage.local.set({ [key]: { ...queue, active: false } });
+        }
+        await showMoodleQueueStatus();
+    });
+    showMoodleQueueStatus();
+
     [
         refs.nextBtnSelector,
         refs.moodleAutoInsertOnLoad,
+        refs.moodleAutoFinishAttempt,
+        refs.moodleAutoSubmitAttempt,
         refs.openeduAutoAdvanceDelayMs,
         refs.openeduAutoAdvanceEnabled,
         refs.openeduRequiredCompletionOnly,

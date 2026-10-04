@@ -9,37 +9,30 @@
         insertHotkey: 'Alt+KeyA',
         autoInsertOnLoad: true,
         nextButtonText: 'Следующая страница',
-        autoSolving: false
+        autoSolving: false,
+        autoFinishAttempt: false
     };
+    let queueActive = false;
 
     async function loadSettings() {
         if (window.ParamExtSettings) {
-            const merged = await window.ParamExtSettings.getSettings();
-            settings = {
-                mode: merged.moodle.mode,
-                wandHotkey: merged.moodle.wandHotkey,
-                insertHotkey: merged.moodle.insertHotkey,
-                autoInsertOnLoad: merged.moodle.autoInsertOnLoad,
-                nextButtonText: merged.moodle.nextButtonText,
-                autoSolving: merged.moodle.autoSolving
-            };
-            return;
+            settings = { ...(await window.ParamExtSettings.getSettings()).moodle };
         }
-
         try {
-            const data = await chrome.storage.local.get('paramExtSettings');
-            if (data.paramExtSettings) {
-                settings = {
-                    mode: data.paramExtSettings.mode || settings.mode,
-                    wandHotkey: data.paramExtSettings.wandKey || settings.wandHotkey,
-                    insertHotkey: data.paramExtSettings.insertKey || settings.insertHotkey,
-                    autoInsertOnLoad: data.paramExtSettings.autoInsertOnLoad !== false,
-                    nextButtonText: data.paramExtSettings.nextBtnText || settings.nextButtonText,
-                    autoSolving: Boolean(data.paramExtSettings.autoSolving)
-                };
+            const queue = await window.ParamExtMoodleQueue.request({ type: 'MOODLE_QUEUE_CONTEXT' });
+            const attemptId = new URL(location.href).searchParams.get('attempt');
+            if (queue?.active && /\/mod\/quiz\/attempt\.php$/.test(location.pathname)
+                && (queue.stage === 'starting' || (queue.stage === 'attempt' && queue.attemptId === attemptId))) {
+                const registered = await window.ParamExtMoodleQueue.request({ type: 'MOODLE_QUEUE_ATTEMPT', attemptId });
+                if (registered?.ok) {
+                    queueActive = true;
+                    settings.mode = 'autoSolve';
+                    settings.autoSolving = true;
+                    settings.autoFinishAttempt = true;
+                }
             }
-        } catch (_) {
-            // Keep defaults if storage cannot be read.
+        } catch (error) {
+            console.error('Moodle queue unavailable', error);
         }
     }
 
@@ -83,27 +76,29 @@
     }
 
     function clickNextButton() {
-        const byValue = document.querySelector('input[type="submit"][value="' + settings.nextButtonText + '"]');
-        if (byValue) {
-            byValue.click();
+        const next = document.querySelector('#mod_quiz-next-nav') || Array.from(document.querySelectorAll('button, input[type="submit"]')).find((element) => {
+            if (!(element instanceof HTMLElement) || !element.closest('form#responseform')) {
+                return false;
+            }
+            const label = element instanceof HTMLInputElement ? element.value : element.textContent;
+            return (label || '').trim() === settings.nextButtonText;
+        });
+        if (!next || next.disabled) {
             return;
         }
 
-        const byText = Array.from(document.querySelectorAll('button, input[type="submit"]')).find((element) => {
-            if (!(element instanceof HTMLElement)) {
-                return false;
-            }
-
-            if (element instanceof HTMLInputElement) {
-                return element.value.trim() === settings.nextButtonText;
-            }
-
-            return (element.textContent || '').trim() === settings.nextButtonText;
-        });
-
-        if (byText && byText instanceof HTMLElement) {
-            byText.click();
+        const form = next.closest('form');
+        const isLastPage = form?.querySelector('input[name="nextpage"]')?.value === '-1';
+        if (isLastPage && !settings.autoFinishAttempt) {
+            return;
         }
+        if (isLastPage) {
+            const attemptId = form?.querySelector('input[name="attempt"]')?.value;
+            if (attemptId) {
+                sessionStorage.setItem('paramExtMoodleFinishAttempt', JSON.stringify({ attemptId, at: Date.now() }));
+            }
+        }
+        next.click();
     }
 
     function applyQueuedAnswers() {
@@ -152,11 +147,27 @@
         }
 
         if (settings.mode === 'autoSolve' && settings.autoSolving) {
-            setTimeout(() => {
+            const started = Date.now();
+            const advance = async () => {
+                if (!settings.autoSolving) {
+                    return;
+                }
+                if (queueActive) {
+                    const queue = await window.ParamExtMoodleQueue.request({ type: 'MOODLE_QUEUE_CONTEXT' }).catch(() => null);
+                    if (!queue?.active || queue.stage !== 'attempt') {
+                        return;
+                    }
+                    applyQueuedAnswers();
+                }
                 if (hasAnsweredDataOnPage()) {
                     clickNextButton();
+                } else if (queueActive && Date.now() - started < 15000) {
+                    setTimeout(advance, 1000);
+                } else if (queueActive) {
+                    window.ParamExtMoodleQueue.request({ type: 'MOODLE_QUEUE_ERROR', error: 'Ответ для текущей страницы не найден. Очередь остановлена.' });
                 }
-            }, 3500);
+            };
+            setTimeout(advance, 3500);
         }
     }
 
@@ -173,7 +184,8 @@
                     insertHotkey: message.settings.moodle.insertHotkey,
                     autoInsertOnLoad: message.settings.moodle.autoInsertOnLoad,
                     nextButtonText: message.settings.moodle.nextButtonText,
-                    autoSolving: Boolean(message.settings.moodle.autoSolving)
+                    autoSolving: Boolean(message.settings.moodle.autoSolving),
+                    autoFinishAttempt: Boolean(message.settings.moodle.autoFinishAttempt)
                 };
             } else if (message.settings) {
                 settings = {
@@ -182,7 +194,8 @@
                     insertHotkey: message.settings.insertKey || settings.insertHotkey,
                     autoInsertOnLoad: message.settings.autoInsertOnLoad !== false,
                     nextButtonText: message.settings.nextBtnText || settings.nextButtonText,
-                    autoSolving: Boolean(message.settings.autoSolving)
+                    autoSolving: Boolean(message.settings.autoSolving),
+                    autoFinishAttempt: Boolean(message.settings.autoFinishAttempt)
                 };
             }
             applySettings();

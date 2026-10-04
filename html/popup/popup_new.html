@@ -142,6 +142,14 @@
                     <button id="btnStart" class="btn btn-sm btn-success" type="button">Старт</button>
                     <button id="btnStop" class="btn btn-sm btn-danger hidden" type="button">Стоп</button>
                 </div>
+                <label class="check-row" id="moodleAutoFinishRow"><input type="checkbox" id="moodleAutoFinishAttempt"><span>Переходить к итогам после последней страницы</span></label>
+                <label class="check-row dependent" id="moodleAutoSubmitRow"><input type="checkbox" id="moodleAutoSubmitAttempt"><span>Автоматически отправлять попытку</span></label>
+                <div class="option-block">
+                    <label class="field"><span>Очередь тестов Moodle (.txt, одна ссылка на строку)</span><input type="file" id="moodleQueueFile" accept=".txt,text/plain"></label>
+                    <div class="action-row"><button type="button" id="moodleQueueStart" class="btn btn-sm btn-success">Запустить очередь</button><button type="button" id="moodleQueueStop" class="btn btn-sm btn-danger">Остановить очередь</button></div>
+                    <p class="queue-note">Очередь принудительно завершает и отправляет попытки. При отсутствии ответов или запроса ручного ввода останавливается.</p>
+                    <p id="moodleQueueStatus" role="status">Очередь не запущена</p>
+                </div>
                 <label class="field">
                     <span>Клавиша палочки</span>
                     <input type="text" id="wandKey" class="hotkey-input" readonly>

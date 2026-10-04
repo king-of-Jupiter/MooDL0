@@ -36,6 +36,8 @@
             autoInsertOnLoad: true,
             nextButtonText: 'Следующая страница',
             autoSolving: false,
+            autoFinishAttempt: false,
+            autoSubmitAttempt: false,
             hideWidgetByDefault: false
         },
         openedu: {
@@ -131,6 +133,8 @@
                 next.moodle.nextButtonText = moodle.nextButtonText.trim();
             }
             next.moodle.autoSolving = Boolean(moodle.autoSolving);
+            next.moodle.autoFinishAttempt = Boolean(moodle.autoFinishAttempt);
+            next.moodle.autoSubmitAttempt = Boolean(moodle.autoSubmitAttempt);
             next.moodle.hideWidgetByDefault = Boolean(moodle.hideWidgetByDefault);
         }
 
@@ -204,6 +208,8 @@
             wandKey: normalized.moodle.wandHotkey,
             insertKey: normalized.moodle.insertHotkey,
             autoInsertOnLoad: normalized.moodle.autoInsertOnLoad,
+            autoFinishAttempt: normalized.moodle.autoFinishAttempt,
+            autoSubmitAttempt: normalized.moodle.autoSubmitAttempt,
             nextBtnText: normalized.moodle.nextButtonText,
             autoSolving: normalized.moodle.autoSolving,
             hideWidgetByDefault: normalized.moodle.hideWidgetByDefault,
@@ -432,6 +438,22 @@
         const selected = platform === 'moodle' ? 'moodle' : 'openedu';
         return deepClone(normalized.backend[selected]);
     }
+
+    global.ParamExtMoodleQueue = {
+        request(message) {
+            return new Promise((resolve, reject) => {
+                const port = chrome.runtime.connect({ name: 'moodle-queue' });
+                port.onMessage.addListener((response) => {
+                    resolve(response);
+                    port.disconnect();
+                });
+                port.onDisconnect.addListener(() => {
+                    reject(new Error(chrome.runtime.lastError?.message || 'Соединение с очередью Moodle закрыто.'));
+                });
+                port.postMessage(message);
+            });
+        }
+    };
 
     global.ParamExtSettings = {
         STORAGE_KEY,

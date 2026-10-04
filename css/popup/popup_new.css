@@ -280,6 +280,19 @@ body {
     margin-top: 8px;
 }
 
+.queue-note,
+#moodleQueueStatus {
+    margin: 8px 0 0;
+    color: #566071;
+    font-size: 11px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+#moodleQueueStatus {
+    font-weight: 700;
+}
+
 .action-row,
 .backend-check {
     display: flex;

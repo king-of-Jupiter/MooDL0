@@ -85,6 +85,7 @@ function openPrivacyPolicyTabGuarded(url, callback) {
 
 installPrivacyPolicyTabsGuard();
 importScripts('background.js');
+importScripts('moodle_queue.js');
 
 const PARAMEXT_SETTINGS_KEY = 'paramExtPlatformSettingsV2';
 const PARAMEXT_LEGACY_SETTINGS_KEY = 'paramExtSettings';
