@@ -1,150 +1,150 @@
-MIT License with Attribution
-
-Copyright © 2025 MooDuSh Contributors
-Based on SyncShare by Naloaty
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-1. The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-2. ATTRIBUTION REQUIREMENT:
-   Any person who uses, modifies, or distributes this software MUST:
-   
-   a) Retain clear and visible attribution to the original SyncShare project
-      (https://chromewebstore.google.com/detail/syncshare/lngijbnmdkejbgnkakeiapeppbpaapib)
-   
-   b) Retain clear and visible attribution to MooDuSh contributors
-   
-   c) If modifications were made, include a clear notice of what was changed
-      and maintain this license in the modified version
-   
-   d) Include this LICENSE file in any distribution of the software
-
-3. DISTRIBUTION REQUIREMENT:
-   If you distribute modified versions of this software:
-   
-   a) You must provide the source code publicly
-   
-   b) You must include this license with all distributions
-   
-   c) You must maintain attribution to both SyncShare and MooDuSh
-   
-   d) Any modifications must also be released under this same license
-      (or a compatible copyleft license)
-
-4. RESTRICTIONS:
-   You CANNOT:
-   
-   a) Remove or obscure copyright notices or attribution
-   
-   b) Claim that you created the original SyncShare
-   
-   c) Claim that you created MooDuSh (if you haven't contributed to it)
-   
-   d) Use the names "SyncShare" or "MooDuSh" for your own products
-      without clear distinction and attribution
-
-5. THE SOFTWARE IS PROVIDED "AS IS":
-   This software is provided as-is, without warranty of any kind, express or
-   implied, including but not limited to the warranties of merchantability,
-   fitness for a particular purpose, and noninfringement. In no event shall
-   the authors or copyright holders be liable for any claim, damages or other
-   liability, whether in an action of contract, tort or otherwise, arising
-   from, out of or in connection with the software or the use or other
-   dealings in the software.
-
-6. DISCLAIMER:
-   This software is intended for educational purposes only. The authors are
-   not responsible for any misuse, academic dishonesty, or violations of
-   institution policies. Users must comply with their institution's honor code
-   and policies regarding academic integrity.
-
----
-
-## ACKNOWLEDGMENTS
-
-This project is built upon the excellent work of:
-
-- **SyncShare** - Original extension by Naloaty
-  https://chromewebstore.google.com/detail/syncshare/lngijbnmdkejbgnkakeiapeppbpaapib?hl=ru&utm_source=ext_sidebar
-
-- **Chrome Web Store** - Distribution platform
-
-- **Moodle Project** - Learning management system
-
-- **Google Chrome Extensions API** - Foundation for development
-
----
-
-## EXAMPLE ATTRIBUTION
-
-When distributing or modifying this software, include attribution like:
-
-### ✅ CORRECT ATTRIBUTION:
-
-```
-MooDuSh - Enhanced SyncShare
-Based on SyncShare by Naloaty
-https://github.com/yourname/MooDuSh
-
-This software is based on SyncShare 
-(https://chromewebstore.google.com/detail/syncshare/lngijbnmdkejbgnkakeiapeppbpaapib)
-and includes the following modifications:
-- Auto-Insert mode for automatic answer filling
-- Auto-Solve mode for automatic test completion
-- Enhanced error handling
-
-Released under MIT License with Attribution.
-See LICENSE file for full details.
-```
-
-### ❌ INCORRECT ATTRIBUTION:
-
-```
-❌ "MooDuSh - My Original Extension"
-❌ "SyncShare Enhanced Edition"
-❌ "My Super Smart Quiz Solver"
-(without mentioning SyncShare or MooDuSh)
-```
-
----
-
-## HOW TO COMPLY WITH THIS LICENSE
-
-1. If you use MooDuSh as-is:
-   - Include this LICENSE file
-   - Include attribution in README.md or documentation
-
-2. If you modify MooDuSh:
-   - Include this LICENSE file
-   - Document your changes
-   - Maintain attribution to SyncShare and MooDuSh
-   - Publish modifications under this license
-
-3. If you distribute MooDuSh:
-   - Include this LICENSE file
-   - Include this complete license text
-   - Maintain all copyright notices
-   - Don't remove or obscure attribution
-
----
-
-## QUESTIONS?
-
-If you have questions about this license or how to properly attribute the software,
-please refer to:
-
-- Original SyncShare: https://chromewebstore.google.com/detail/syncshare/lngijbnmdkejbgnkakeiapeppbpaapib
-- MIT License Details: https://opensource.org/licenses/MIT
-- Attribution Best Practices: https://wiki.creativecommons.org/wiki/Recommended_practices_for_attribution
-
----
-
-Last Updated: December 17, 2025
-Version: 1.0
+MIT License with Attribution
+
+Copyright © 2025 MooDL0 Contributors
+Based on SyncShare by Naloaty
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
+
+2. ATTRIBUTION REQUIREMENT:
+   Any person who uses, modifies, or distributes this software MUST:
+   
+   a) Retain clear and visible attribution to the original SyncShare project
+      (https://chromewebstore.google.com/detail/syncshare/lngijbnmdkejbgnkakeiapeppbpaapib)
+   
+   b) Retain clear and visible attribution to MooDL0 contributors
+   
+   c) If modifications were made, include a clear notice of what was changed
+      and maintain this license in the modified version
+   
+   d) Include this LICENSE file in any distribution of the software
+
+3. DISTRIBUTION REQUIREMENT:
+   If you distribute modified versions of this software:
+   
+   a) You must provide the source code publicly
+   
+   b) You must include this license with all distributions
+   
+   c) You must maintain attribution to both SyncShare and MooDL0
+   
+   d) Any modifications must also be released under this same license
+      (or a compatible copyleft license)
+
+4. RESTRICTIONS:
+   You CANNOT:
+   
+   a) Remove or obscure copyright notices or attribution
+   
+   b) Claim that you created the original SyncShare
+   
+   c) Claim that you created MooDL0 (if you haven't contributed to it)
+   
+   d) Use the names "SyncShare" or "MooDL0" for your own products
+      without clear distinction and attribution
+
+5. THE SOFTWARE IS PROVIDED "AS IS":
+   This software is provided as-is, without warranty of any kind, express or
+   implied, including but not limited to the warranties of merchantability,
+   fitness for a particular purpose, and noninfringement. In no event shall
+   the authors or copyright holders be liable for any claim, damages or other
+   liability, whether in an action of contract, tort or otherwise, arising
+   from, out of or in connection with the software or the use or other
+   dealings in the software.
+
+6. DISCLAIMER:
+   This software is intended for educational purposes only. The authors are
+   not responsible for any misuse, academic dishonesty, or violations of
+   institution policies. Users must comply with their institution's honor code
+   and policies regarding academic integrity.
+
+---
+
+## ACKNOWLEDGMENTS
+
+This project is built upon the excellent work of:
+
+- **SyncShare** - Original extension by Naloaty
+  https://chromewebstore.google.com/detail/syncshare/lngijbnmdkejbgnkakeiapeppbpaapib?hl=ru&utm_source=ext_sidebar
+
+- **Chrome Web Store** - Distribution platform
+
+- **Moodle Project** - Learning management system
+
+- **Google Chrome Extensions API** - Foundation for development
+
+---
+
+## EXAMPLE ATTRIBUTION
+
+When distributing or modifying this software, include attribution like:
+
+### ✅ CORRECT ATTRIBUTION:
+
+```
+MooDL0 - Enhanced SyncShare
+Based on SyncShare by Naloaty
+https://github.com/yourname/MooDL0
+
+This software is based on SyncShare 
+(https://chromewebstore.google.com/detail/syncshare/lngijbnmdkejbgnkakeiapeppbpaapib)
+and includes the following modifications:
+- Auto-Insert mode for automatic answer filling
+- Auto-Solve mode for automatic test completion
+- Enhanced error handling
+
+Released under MIT License with Attribution.
+See LICENSE file for full details.
+```
+
+### ❌ INCORRECT ATTRIBUTION:
+
+```
+❌ "MooDL0 - My Original Extension"
+❌ "SyncShare Enhanced Edition"
+❌ "My Super Smart Quiz Solver"
+(without mentioning SyncShare or MooDL0)
+```
+
+---
+
+## HOW TO COMPLY WITH THIS LICENSE
+
+1. If you use MooDL0 as-is:
+   - Include this LICENSE file
+   - Include attribution in README.md or documentation
+
+2. If you modify MooDL0:
+   - Include this LICENSE file
+   - Document your changes
+   - Maintain attribution to SyncShare and MooDL0
+   - Publish modifications under this license
+
+3. If you distribute MooDL0:
+   - Include this LICENSE file
+   - Include this complete license text
+   - Maintain all copyright notices
+   - Don't remove or obscure attribution
+
+---
+
+## QUESTIONS?
+
+If you have questions about this license or how to properly attribute the software,
+please refer to:
+
+- Original SyncShare: https://chromewebstore.google.com/detail/syncshare/lngijbnmdkejbgnkakeiapeppbpaapib
+- MIT License Details: https://opensource.org/licenses/MIT
+- Attribution Best Practices: https://wiki.creativecommons.org/wiki/Recommended_practices_for_attribution
+
+---
+
+Last Updated: December 17, 2025
+Version: 1.0

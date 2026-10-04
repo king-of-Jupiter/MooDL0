@@ -90,7 +90,7 @@
             if (next.active) {
                 try {
                     const destination = new URL(queue.links[index]);
-                    destination.hash = 'moodush-queue=' + next.launchToken;
+                    destination.hash = 'moodl0-queue=' + next.launchToken;
                     await chrome.tabs.update(queue.tabId, { url: destination.href });
                 } catch (error) {
                     await save({ ...next, active: false, error: String(error.message || error) });
@@ -113,7 +113,7 @@
                 return;
             }
             const url = new URL(tab.url);
-            if (url.origin !== queue.origin || url.hash !== '#moodush-queue=' + queue.launchToken
+            if (url.origin !== queue.origin || url.hash !== '#moodl0-queue=' + queue.launchToken
                 || url.origin + url.pathname + url.search !== queue.links[queue.index]) {
                 return;
             }

@@ -1,6 +1,6 @@
 <h1 align="center">
-  <img src="logo_main.png" alt="MooDuSh" width="38" height="38" style="vertical-align: middle;">
-  MooDuSh — Enhanced SyncShare
+  <img src="logo_main.png" alt="MooDL0" width="38" height="38" style="vertical-align: middle;">
+  MooDL0 — Enhanced SyncShare
 </h1>
 
 <p align="center">
@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/License-MIT%20with%20Attribution-green?style=flat-square" alt="License">
 </p>
 
-> **MooDuSh** — расширенная версия SyncShare для автоматизации тестов на **Moodle**.
+> **MooDL0** — расширенная версия SyncShare для автоматизации тестов на **Moodle**.
 
 ---
 
@@ -30,13 +30,13 @@
 
 ### Шаг 1: Скачайте расширение
 
-Откройте последний [**GitHub Release**](https://github.com/KOSFin/MooDuSh/releases/latest) и скачайте `moodush-extension.zip`. Распакуйте архив в удобное место.
+Откройте последний [**GitHub Release**](https://github.com/king-of-Jupiter/MooDL0/releases/latest) и скачайте `moodl0-extension.zip`. Распакуйте архив в удобное место.
 
 Для разработки можно клонировать репозиторий:
 
 ```bash
-git clone https://github.com/KOSFin/MooDuSh-from-syncshare.git
-cd MooDuSh-from-syncshare
+git clone https://github.com/king-of-Jupiter/MooDL0.git
+cd MooDL0-from-syncshare
 npm ci
 npm run build:extension
 ```
@@ -46,10 +46,10 @@ npm run build:extension
 1. Откройте `chrome://extensions/`
 2. Включите **Режим разработчика** (переключатель в правом верхнем углу)
 3. Нажмите **Загрузить распакованное расширение**
-4. Выберите папку с файлами MooDuSh (где лежит `manifest.json`)
-5. Готово — иконка MooDuSh появится на панели расширений
+4. Выберите папку с файлами MooDL0 (где лежит `manifest.json`)
+5. Готово — иконка MooDL0 появится на панели расширений
 
-> **Примечание:** MooDuSh автоматически заменит оригинальное расширение SyncShare, если оно установлено, так как оба используют одинаковые ключи Chrome. Весь функционал SyncShare сохраняется.
+> **Примечание:** MooDL0 автоматически заменит оригинальное расширение SyncShare, если оно установлено, так как оба используют одинаковые ключи Chrome. Весь функционал SyncShare сохраняется.
 
 ---
 
@@ -67,7 +67,7 @@ npm run build:extension
 .\scripts\update.ps1
 ```
 
-После обновления откройте `chrome://extensions/` и нажмите кнопку обновления у MooDuSh. Само расширение не перезаписывает свою папку из Chrome — это делает только внешний скрипт, запущенный пользователем.
+После обновления откройте `chrome://extensions/` и нажмите кнопку обновления у MooDL0. Само расширение не перезаписывает свою папку из Chrome — это делает только внешний скрипт, запущенный пользователем.
 
 ---
 
@@ -75,7 +75,7 @@ npm run build:extension
 
 Moodle работает сразу после установки без дополнительной настройки.
 
-1. Нажмите на иконку MooDuSh
+1. Нажмите на иконку MooDL0
 2. Примите политику в первом экране popup
 3. Выберите режим:
    - **Палочка** — кнопка рядом с каждым вопросом (по умолчанию)
@@ -112,7 +112,7 @@ MOODLE_API_BASE_URL=https://syncshare.naloaty.me/api
 
 ## GitHub Actions и релизы
 
-Workflow `.github/workflows/extension.yml` собирает `moodush-extension.zip` и публикует Release только по tag `v*` или ручному запуску.
+Workflow `.github/workflows/extension.yml` собирает `moodl0-extension.zip` и публикует Release только по tag `v*` или ручному запуску.
 
 ### Repository Variables
 
@@ -157,7 +157,7 @@ Workflow `.github/workflows/extension.yml` собирает `moodush-extension.z
 ## Структура проекта
 
 ```text
-MooDuSh/
+MooDL0/
   manifest.json          — конфигурация расширения (Manifest V3)
   env.example            — пример переменных окружения
   scripts/update.sh      — удобное обновление через Git
@@ -189,7 +189,7 @@ MooDuSh/
 О: Если скачивали через Git, выполните `./scripts/update.sh`, затем обновите расширение в `chrome://extensions/`.
 
 **В: Как вернуться на оригинальный SyncShare?**
-О: Удалите MooDuSh из `chrome://extensions/` и установите [SyncShare из Chrome Web Store](https://chromewebstore.google.com/detail/syncshare/lngijbnmdkejbgnkakeiapeppbpaapib?hl=ru&utm_source=ext_sidebar).
+О: Удалите MooDL0 из `chrome://extensions/` и установите [SyncShare из Chrome Web Store](https://chromewebstore.google.com/detail/syncshare/lngijbnmdkejbgnkakeiapeppbpaapib?hl=ru&utm_source=ext_sidebar).
 
 **В: Авто-прорешивание не переходит на следующую страницу (Moodle)**
 О: Проверьте, что текст кнопки «Далее» в настройках совпадает с текстом на странице (по умолчанию «Следующая страница»).
@@ -200,7 +200,7 @@ MooDuSh/
 
 Если что-то не работает или есть идеи по улучшению — создайте issue в репозитории:
 
-**[GitHub Issues](https://github.com/KOSFin/MooDuSh-from-syncshare/issues)**
+**[GitHub Issues](https://github.com/king-of-Jupiter/MooDL0/issues)**
 
 Пожалуйста, опишите:
 - Что именно не работает
@@ -213,7 +213,7 @@ MooDuSh/
 
 <div align="center">
 
-**Made with ❤️ by MooDuSh contributors**
+**Made with ❤️ by MooDL0 contributors**
 
 [Оригинальный SyncShare](https://chromewebstore.google.com/detail/syncshare/lngijbnmdkejbgnkakeiapeppbpaapib?hl=ru&utm_source=ext_sidebar)
 

@@ -12,7 +12,7 @@
     const currentUrl = new URL(location.href);
     const queue = isView && stored?.active && stored.stage === 'view'
         && stored.origin === currentUrl.origin
-        && currentUrl.hash === '#moodush-queue=' + stored.launchToken
+        && currentUrl.hash === '#moodl0-queue=' + stored.launchToken
         && stored.links?.[stored.index] === currentUrl.origin + currentUrl.pathname + currentUrl.search
         ? { active: true, url: stored.links[stored.index], stage: stored.stage, tabId: stored.tabId }
         : tabs;
@@ -52,7 +52,7 @@
         const latest = (await chrome.storage.local.get(key))[key];
         if (!latest?.active || latest.stage !== 'view' || latest.tabId !== queue.tabId
             || latest.index !== stored.index || latest.links[latest.index] !== current.origin + current.pathname + current.search
-            || current.hash !== '#moodush-queue=' + latest.launchToken) {
+            || current.hash !== '#moodl0-queue=' + latest.launchToken) {
             return;
         }
         await chrome.storage.local.set({ [key]: { ...latest, stage: 'starting' } });

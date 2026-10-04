@@ -1,97 +1,97 @@
-/**
- * Based on https://codepen.io/beforesemicolon/pen/abNYjKo
- * Author: Before Semicolon
- */
-
-.moodush-cm,
-.moodush-cm .sub-menu {
-    position: fixed;
-    color: #000;
-    background: #fff;
-    z-index: 100500;
-    padding: 5px 0;
-    border-radius: 4px;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
-    font-size: 12px;
-    font-family: sans-serif;
-    margin: 0;
-}
-
-.moodush-cm .sub-menu {
-    position: absolute;
-    top: 0;
-    left: 100%;
-    display: none;
-    z-index: 100500;
-    max-width: 200px;
-    min-width: 130px;
-    margin: 0;
-    flex-direction: column;
-}
-
-.moodush-cm .menu-item {
-    max-width: 200px;
-    min-width: 130px;
-    display: flex;
-    align-items: center;
-    padding: 6px 8px;
-    cursor: pointer;
-    position: relative;
-    border-bottom: 1px solid #f2f2f2;
-    transition: 0.2s;
-}
-
-.moodush-cm .menu-item .item-label {
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.moodush-cm .menu-item .postfix,
-.moodush-cm .sub-menu .menu-item .postfix {
-    margin: 0 0 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.moodush-cm .menu-item .postfix .content,
-.moodush-cm .sub-menu .menu-item .postfix .content {
-    border-radius: 4px;
-    padding: 3px 4px;
-    line-height: 1;
-}
-
-.moodush-cm .menu-item .prefix,
-.moodush-cm .sub-menu .menu-item .prefix {
-    margin: 0 8px 0 4px;
-    border-radius: 4px;
-    line-height: 1;
-}
-
-.moodush-cm .menu-item:last-of-type {
-    border-bottom: none;
-}
-
-.moodush-cm .menu-item:hover {
-    background: #f2f2f2;
-}
-
-.moodush-cm .menu-item:hover > .sub-menu {
-    display: flex;
-}
-
-.moodush-cm.left .sub-menu {
-    left: 0;
-    transform: translateX(-100%);
-}
-
-.moodush-cm.top .sub-menu {
-    top: 100%;
-    transform: translateY(-100%);
-}
-
-.moodush-cm.left.top .sub-menu {
-    transform: translate(-100%, -100%);
-}
+/**
+ * Based on https://codepen.io/beforesemicolon/pen/abNYjKo
+ * Author: Before Semicolon
+ */
+
+.moodl0-cm,
+.moodl0-cm .sub-menu {
+    position: fixed;
+    color: #000;
+    background: #fff;
+    z-index: 100500;
+    padding: 5px 0;
+    border-radius: 4px;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+    font-size: 12px;
+    font-family: sans-serif;
+    margin: 0;
+}
+
+.moodl0-cm .sub-menu {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    display: none;
+    z-index: 100500;
+    max-width: 200px;
+    min-width: 130px;
+    margin: 0;
+    flex-direction: column;
+}
+
+.moodl0-cm .menu-item {
+    max-width: 200px;
+    min-width: 130px;
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    cursor: pointer;
+    position: relative;
+    border-bottom: 1px solid #f2f2f2;
+    transition: 0.2s;
+}
+
+.moodl0-cm .menu-item .item-label {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.moodl0-cm .menu-item .postfix,
+.moodl0-cm .sub-menu .menu-item .postfix {
+    margin: 0 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.moodl0-cm .menu-item .postfix .content,
+.moodl0-cm .sub-menu .menu-item .postfix .content {
+    border-radius: 4px;
+    padding: 3px 4px;
+    line-height: 1;
+}
+
+.moodl0-cm .menu-item .prefix,
+.moodl0-cm .sub-menu .menu-item .prefix {
+    margin: 0 8px 0 4px;
+    border-radius: 4px;
+    line-height: 1;
+}
+
+.moodl0-cm .menu-item:last-of-type {
+    border-bottom: none;
+}
+
+.moodl0-cm .menu-item:hover {
+    background: #f2f2f2;
+}
+
+.moodl0-cm .menu-item:hover > .sub-menu {
+    display: flex;
+}
+
+.moodl0-cm.left .sub-menu {
+    left: 0;
+    transform: translateX(-100%);
+}
+
+.moodl0-cm.top .sub-menu {
+    top: 100%;
+    transform: translateY(-100%);
+}
+
+.moodl0-cm.left.top .sub-menu {
+    transform: translate(-100%, -100%);
+}

@@ -9,7 +9,7 @@
          "64": "logo_main.png"
       },
       "default_popup": "html/popup/popup_new.html",
-      "default_title": "MooDuSh"
+      "default_title": "MooDL0"
    },
    "background": {
       "service_worker": "js/background_worker.js"
@@ -47,7 +47,7 @@
    },
    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuyv8IgdS0U/1i+JXF3//lgI/06slEmgBvCjHNw46lsGXlOZbaEtgXFM8WufA0VmIDTnOxwpjWaoDbDM9+2Zg9YZNEP/6sFqmZ7a1L+Hcjy0JH5RfgyGV48fl5uFBRRb5PiT9xm4XU5s3g5/rKWTFKKT4thBL9VsrAXF8O3WTIfEpBoW+oAkBPT8bTQXbc+5TkdObEbV61NB90uvLPIXwGL/Ph5TsHYyfZDz/L7WFdIMVhglDT934CxJsSOnfbWsaF0mAUbyysKrmkKZWXCsbHrM2+x8Xt3s85fmF96lRf++Mezik04Mhp9iJrr/A/XV1ByGvAcmAFbqY6DK81z5WiQIDAQAB",
    "manifest_version": 3,
-   "name": "MooDuSh",
+   "name": "MooDL0",
    "permissions": [ "storage", "contextMenus", "scripting" ],
    "update_url": "https://clients2.google.com/service/update2/crx",
    "version": "3.1.1",

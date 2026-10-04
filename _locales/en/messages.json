@@ -1,104 +1,104 @@
-{
-   "changelogContent": {
-      "message": "What's new?\u003Cbr>\u003Cbr>- Added the ability to preview the list of test questions, as well as answers and statistics*.\u003Cbr>- Implemented additional measures against extension detection.\u003Cbr>- Fixed some bugs and improved the overall stability of the extension.\u003Cbr>\u003Cbr>* Will become available soon for users of the extended version.\u003C/br>\u003C/br>P.S. If you encounter any blocking of the extension in your Moodle system, please contact us at syncshare.ext@gmail.com\u003C/br>\u003C/br>P.P.S. You can learn more about the features of the extended version \u003Cb>\u003Ca href=\"https://syncshare.naloaty.me/docs/account/features/\" target=\"_blank\">here\u003C/a>.\u003C/b>"
-   },
-   "changelogTitle": {
-      "message": "MooDuSh: Update"
-   },
-   "checkingStatusContent": {
-      "message": "Checking the service status..."
-   },
-   "copy": {
-      "message": "Copy"
-   },
-   "documentation": {
-      "message": "Documentation"
-   },
-   "donate": {
-      "message": "Donate"
-   },
-   "extensionDescription": {
-      "message": "Synchronize and share right answers to Moodle quizzes."
-   },
-   "genericAuthError": {
-      "message": "Unexpected auth error :("
-   },
-   "gotIt": {
-      "message": "Got it"
-   },
-   "headHuntContent": {
-      "message": "Hi! If you are good with JavaScript and Node.js and want to improve MooDuSh in any way, we are inviting you to join us. Contact us 👉 syncshare.ext@gmail.com 👈"
-   },
-   "highDemandContent": {
-      "message": "The MooDuSh services are currently experiencing a heavy load, which may cause the extension to not work partially. Thank you for your understanding.\u003Cbr>\u003Cbr>P.S. Unfortunately, we cannot afford to scale the MooDuSh infrastructure due to lack of funding. However, if you like this extension and want to support further work and development of the project, you can do it \u003Cb>\u003Ca href=\"https://syncshare.naloaty.me/#donation\" target=\"_blank\">here\u003C/a>\u003C/b> or by clicking on the button below, as well as in the settings menu.\u003Cbr>"
-   },
-   "highDemandTitle": {
-      "message": "MooDuSh: High Load"
-   },
-   "installContent": {
-      "message": "Hi!\u003Cbr>\u003Cbr>Thank you for installing our web extension. To learn about all the features of MooDuSh, we highly recommend that you read the documentation at the \u003Cb>\u003Ca href=\"https://syncshare.naloaty.me/docs\" target=\"_blank\">link\u003C/a>\u003C/b>.\u003Cbr>\u003Cbr>P.S. A link to the documentation is always available in the \u003Cb>\u003Ca href=\"https://syncshare.naloaty.me/docs/features/settings/\" target=\"_blank\">settings menu\u003C/a>\u003C/b>."
-   },
-   "installTitle": {
-      "message": "MooDuSh: (づ｡◕‿‿◕｡)づ"
-   },
-   "invalidLoginOrPassword": {
-      "message": "Wrong login or password"
-   },
-   "magicMenuSubmissions": {
-      "message": "Submissions"
-   },
-   "magicMenuSuggestions": {
-      "message": "Suggestions"
-   },
-   "maintenanceContent": {
-      "message": "Maintenance work to improve MooDuSh services is currently underway. The extension may not work for some time. Thank you for your understanding."
-   },
-   "maintenanceTitle": {
-      "message": "MooDuSh: Maintenance"
-   },
-   "noQuestionSolution": {
-      "message": "No answer yet"
-   },
-   "openQuizViewMessage": {
-      "message": "Open question bank"
-   },
-   "parallelAttemptsContent": {
-      "message": "Internal MooDuSh state tell us that you are trying to solve several quizzes at the same time. We \u003Cb>highly recommend\u003C/b> that you do not do this as it will cause MooDuSh to not work properly.\u003Cbr>\u003Cbr>Thank you for your understanding.\u003Cbr>\u003Cbr>P.S. If you think that this message has appeared in error, please report it to the address listed in the settings menu."
-   },
-   "parallelAttemptsTitle": {
-      "message": "MooDuSh: Critical Error"
-   },
-   "proStatusNotAvailable": {
-      "message": "Basic functionality only."
-   },
-   "questionNotSupportedMessage": {
-      "message": "Question unsupported"
-   },
-   "quizBoardPageIncompatible": {
-      "message": "Failed to obtain all required data. Try reloading the page."
-   },
-   "quizCompletionMessage": {
-      "message": "This quiz has been solved {count} time(s)"
-   },
-   "serviceReachableContent": {
-      "message": "Service is online!"
-   },
-   "serviceUnreachableContent": {
-      "message": "Failed to check MooDuSh service status.\u003Cbr>\u003Cbr>Possible reasons:\u003Cbr>– Your Internet connection is too slow;\u003Cbr>– The MooDuSh service is currently in high demand;\u003Cbr>– Your Internet Service Provider is blocking access to the MooDuSh service;\u003Cbr>– MooDuSh service is currently under maintenance;\u003Cbr>– We've screwed up somewhere - we'll fix it someday ;)\u003Cbr>\u003Cbr>What can you do?\u003Cbr>– Try to reload the page to check the status again;\u003Cbr> – Try to use a proxy-server or VPN;\u003Cbr>– Contact us: support@syncshare.ru (please attach diagnostics file: Menu -> «Диагностика» -> «Скачать»)."
-   },
-   "serviceUnreachableTitle": {
-      "message": "MooDuSh: Something went wrong..."
-   },
-   "syncshare": {
-      "message": "MooDuSh"
-   },
-   "update": {
-      "message": "Update"
-   },
-   "updateAvailableContent": {
-      "message": "Please be advised that a new version of MooDuSh is available. For some reason your browser has not installed the update automatically. We recommend doing the update manually, as the current version will soon stop working."
-   },
-   "updateAvailableTitle": {
-      "message": "MooDuSh: Update Available"
-   }
-}
+{
+   "changelogContent": {
+      "message": "What's new?\u003Cbr>\u003Cbr>- Added the ability to preview the list of test questions, as well as answers and statistics*.\u003Cbr>- Implemented additional measures against extension detection.\u003Cbr>- Fixed some bugs and improved the overall stability of the extension.\u003Cbr>\u003Cbr>* Will become available soon for users of the extended version.\u003C/br>\u003C/br>P.S. If you encounter any blocking of the extension in your Moodle system, please contact us at syncshare.ext@gmail.com\u003C/br>\u003C/br>P.P.S. You can learn more about the features of the extended version \u003Cb>\u003Ca href=\"https://syncshare.naloaty.me/docs/account/features/\" target=\"_blank\">here\u003C/a>.\u003C/b>"
+   },
+   "changelogTitle": {
+      "message": "MooDL0: Update"
+   },
+   "checkingStatusContent": {
+      "message": "Checking the service status..."
+   },
+   "copy": {
+      "message": "Copy"
+   },
+   "documentation": {
+      "message": "Documentation"
+   },
+   "donate": {
+      "message": "Donate"
+   },
+   "extensionDescription": {
+      "message": "Synchronize and share right answers to Moodle quizzes."
+   },
+   "genericAuthError": {
+      "message": "Unexpected auth error :("
+   },
+   "gotIt": {
+      "message": "Got it"
+   },
+   "headHuntContent": {
+      "message": "Hi! If you are good with JavaScript and Node.js and want to improve MooDL0 in any way, we are inviting you to join us. Contact us 👉 syncshare.ext@gmail.com 👈"
+   },
+   "highDemandContent": {
+      "message": "The MooDL0 services are currently experiencing a heavy load, which may cause the extension to not work partially. Thank you for your understanding.\u003Cbr>\u003Cbr>P.S. Unfortunately, we cannot afford to scale the MooDL0 infrastructure due to lack of funding. However, if you like this extension and want to support further work and development of the project, you can do it \u003Cb>\u003Ca href=\"https://syncshare.naloaty.me/#donation\" target=\"_blank\">here\u003C/a>\u003C/b> or by clicking on the button below, as well as in the settings menu.\u003Cbr>"
+   },
+   "highDemandTitle": {
+      "message": "MooDL0: High Load"
+   },
+   "installContent": {
+      "message": "Hi!\u003Cbr>\u003Cbr>Thank you for installing our web extension. To learn about all the features of MooDL0, we highly recommend that you read the documentation at the \u003Cb>\u003Ca href=\"https://syncshare.naloaty.me/docs\" target=\"_blank\">link\u003C/a>\u003C/b>.\u003Cbr>\u003Cbr>P.S. A link to the documentation is always available in the \u003Cb>\u003Ca href=\"https://syncshare.naloaty.me/docs/features/settings/\" target=\"_blank\">settings menu\u003C/a>\u003C/b>."
+   },
+   "installTitle": {
+      "message": "MooDL0: (づ｡◕‿‿◕｡)づ"
+   },
+   "invalidLoginOrPassword": {
+      "message": "Wrong login or password"
+   },
+   "magicMenuSubmissions": {
+      "message": "Submissions"
+   },
+   "magicMenuSuggestions": {
+      "message": "Suggestions"
+   },
+   "maintenanceContent": {
+      "message": "Maintenance work to improve MooDL0 services is currently underway. The extension may not work for some time. Thank you for your understanding."
+   },
+   "maintenanceTitle": {
+      "message": "MooDL0: Maintenance"
+   },
+   "noQuestionSolution": {
+      "message": "No answer yet"
+   },
+   "openQuizViewMessage": {
+      "message": "Open question bank"
+   },
+   "parallelAttemptsContent": {
+      "message": "Internal MooDL0 state tell us that you are trying to solve several quizzes at the same time. We \u003Cb>highly recommend\u003C/b> that you do not do this as it will cause MooDL0 to not work properly.\u003Cbr>\u003Cbr>Thank you for your understanding.\u003Cbr>\u003Cbr>P.S. If you think that this message has appeared in error, please report it to the address listed in the settings menu."
+   },
+   "parallelAttemptsTitle": {
+      "message": "MooDL0: Critical Error"
+   },
+   "proStatusNotAvailable": {
+      "message": "Basic functionality only."
+   },
+   "questionNotSupportedMessage": {
+      "message": "Question unsupported"
+   },
+   "quizBoardPageIncompatible": {
+      "message": "Failed to obtain all required data. Try reloading the page."
+   },
+   "quizCompletionMessage": {
+      "message": "This quiz has been solved {count} time(s)"
+   },
+   "serviceReachableContent": {
+      "message": "Service is online!"
+   },
+   "serviceUnreachableContent": {
+      "message": "Failed to check MooDL0 service status.\u003Cbr>\u003Cbr>Possible reasons:\u003Cbr>– Your Internet connection is too slow;\u003Cbr>– The MooDL0 service is currently in high demand;\u003Cbr>– Your Internet Service Provider is blocking access to the MooDL0 service;\u003Cbr>– MooDL0 service is currently under maintenance;\u003Cbr>– We've screwed up somewhere - we'll fix it someday ;)\u003Cbr>\u003Cbr>What can you do?\u003Cbr>– Try to reload the page to check the status again;\u003Cbr> – Try to use a proxy-server or VPN;\u003Cbr>– Contact us: support@syncshare.ru (please attach diagnostics file: Menu -> «Диагностика» -> «Скачать»)."
+   },
+   "serviceUnreachableTitle": {
+      "message": "MooDL0: Something went wrong..."
+   },
+   "syncshare": {
+      "message": "MooDL0"
+   },
+   "update": {
+      "message": "Update"
+   },
+   "updateAvailableContent": {
+      "message": "Please be advised that a new version of MooDL0 is available. For some reason your browser has not installed the update automatically. We recommend doing the update manually, as the current version will soon stop working."
+   },
+   "updateAvailableTitle": {
+      "message": "MooDL0: Update Available"
+   }
+}

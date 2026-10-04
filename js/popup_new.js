@@ -458,7 +458,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await chrome.storage.local.set({ [key]: queue });
             refs.moodleQueueStatus.textContent = `Запущено: 1 из ${links.length}`;
             const destination = new URL(links[0]);
-            destination.hash = 'moodush-queue=' + launchToken;
+            destination.hash = 'moodl0-queue=' + launchToken;
             await chrome.tabs.update(queue.tabId, { url: destination.href, active: true });
         } catch (error) {
             const key = 'paramExtMoodleQueue';
