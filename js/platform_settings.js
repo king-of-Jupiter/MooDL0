@@ -11,23 +11,20 @@
     const buildConfig = global.ParamExtBuildConfig || {};
 
     const DEFAULT_SETTINGS = {
-        activePlatform: 'openedu',
+        activePlatform: 'moodle',
         backend: {
             moodle: Object.assign(deepClone(DEFAULT_BACKEND_CONFIG), {
                 apiBaseUrl: buildConfig.moodleApiBaseUrl || DEFAULT_BACKEND_CONFIG.apiBaseUrl
-            }),
-            openedu: Object.assign(deepClone(DEFAULT_BACKEND_CONFIG), {
-                apiBaseUrl: buildConfig.openeduApiBaseUrl || DEFAULT_BACKEND_CONFIG.apiBaseUrl
             })
         },
         onboarding: {
             privacyAccepted: false,
             allowTechnicalDataCollection: true,
             completed: false,
-            moodleOnly: false
+            moodleOnly: true
         },
         ui: {
-            lastTab: 'openedu'
+            lastTab: 'moodle'
         },
         moodle: {
             mode: 'wand',
@@ -40,24 +37,7 @@
             autoSubmitAttempt: false,
             hideWidgetByDefault: false
         },
-        openedu: {
-            mode: 'stick',
-            backendVersion: 'v2',
-            stickHotkey: 'Alt+KeyS',
-            autoAdvanceEnabled: false,
-            activeTabRefreshEnabled: true,
-            activeTabPostSubmitRefreshEnabled: false,
-            autoAdvanceDelayMs: 1800,
-            requiredCompletionOnly: true,
-            showFallbackStats: true,
-            autoUseSimilarAnswers: false,
-            autoUseFallbackAnswers: false,
-            autoCheckAnswers: false,
-            missingAnswerAction: 'stop'
-        },
-        diagnostics: {
-            openeduDebugOverlay: false
-        }
+        diagnostics: {}
     };
 
     function deepClone(obj) {
@@ -81,43 +61,21 @@
         const next = deepClone(DEFAULT_SETTINGS);
         const source = raw && typeof raw === 'object' ? raw : {};
 
-        if (source.activePlatform === 'moodle' || source.activePlatform === 'openedu') {
-            next.activePlatform = source.activePlatform;
-        }
+        next.activePlatform = 'moodle';
 
         if (source.backend && typeof source.backend === 'object') {
             const backend = source.backend;
-            const hasPlatformBackend = backend.moodle || backend.openedu;
-
-            if (hasPlatformBackend) {
-                ['moodle', 'openedu'].forEach((platform) => {
-                    const current = backend[platform];
-                    if (!current || typeof current !== 'object') {
-                        return;
-                    }
-
-                    if (typeof current.apiBaseUrl === 'string' && current.apiBaseUrl.trim().length > 0) {
-                        next.backend[platform].apiBaseUrl = current.apiBaseUrl.trim().replace(/\/$/, '');
-                    }
-                    if (typeof current.apiToken === 'string') {
-                        next.backend[platform].apiToken = current.apiToken.trim();
-                    }
-                    next.backend[platform].requestTimeoutMs = Math.max(1000, toNumberOrFallback(current.requestTimeoutMs, next.backend[platform].requestTimeoutMs));
-                });
-            } else {
-                if (typeof backend.apiBaseUrl === 'string' && backend.apiBaseUrl.trim().length > 0) {
-                    const normalizedUrl = backend.apiBaseUrl.trim().replace(/\/$/, '');
-                    next.backend.moodle.apiBaseUrl = normalizedUrl;
-                    next.backend.openedu.apiBaseUrl = normalizedUrl;
+            const current = backend.moodle && typeof backend.moodle === 'object' ? backend.moodle : null;
+            const legacy = (!current && typeof backend.apiBaseUrl === 'string') ? backend : null;
+            const effective = current || legacy;
+            if (effective) {
+                if (typeof effective.apiBaseUrl === 'string' && effective.apiBaseUrl.trim().length > 0) {
+                    next.backend.moodle.apiBaseUrl = effective.apiBaseUrl.trim().replace(/\/$/, '');
                 }
-                if (typeof backend.apiToken === 'string') {
-                    const token = backend.apiToken.trim();
-                    next.backend.moodle.apiToken = token;
-                    next.backend.openedu.apiToken = token;
+                if (typeof effective.apiToken === 'string') {
+                    next.backend.moodle.apiToken = effective.apiToken.trim();
                 }
-                const timeoutMs = Math.max(1000, toNumberOrFallback(backend.requestTimeoutMs, next.backend.openedu.requestTimeoutMs));
-                next.backend.moodle.requestTimeoutMs = timeoutMs;
-                next.backend.openedu.requestTimeoutMs = timeoutMs;
+                next.backend.moodle.requestTimeoutMs = Math.max(1000, toNumberOrFallback(effective.requestTimeoutMs, next.backend.moodle.requestTimeoutMs));
             }
         }
 
@@ -138,63 +96,16 @@
             next.moodle.hideWidgetByDefault = Boolean(moodle.hideWidgetByDefault);
         }
 
-        if (source.openedu && typeof source.openedu === 'object') {
-            const openedu = source.openedu;
-            if (openedu.mode === 'stick' || openedu.mode === 'assist' || openedu.mode === 'autoSolve') {
-                next.openedu.mode = openedu.mode;
-            }
-            if (openedu.backendVersion === 'v1' || openedu.backendVersion === 'v2') {
-                next.openedu.backendVersion = openedu.backendVersion;
-            }
-            next.openedu.stickHotkey = normalizeHotkey(openedu.stickHotkey, next.openedu.stickHotkey);
-            next.openedu.autoAdvanceEnabled = Boolean(openedu.autoAdvanceEnabled);
-            next.openedu.activeTabRefreshEnabled = Boolean(openedu.activeTabRefreshEnabled);
-            next.openedu.activeTabPostSubmitRefreshEnabled = Boolean(openedu.activeTabPostSubmitRefreshEnabled);
-            next.openedu.requiredCompletionOnly = Boolean(openedu.requiredCompletionOnly);
-            next.openedu.showFallbackStats = Boolean(openedu.showFallbackStats);
-            next.openedu.autoUseSimilarAnswers = Boolean(openedu.autoUseSimilarAnswers);
-            next.openedu.autoUseFallbackAnswers = Boolean(openedu.autoUseFallbackAnswers);
-            next.openedu.autoCheckAnswers = Boolean(openedu.autoCheckAnswers);
-            if (openedu.missingAnswerAction === 'stop' || openedu.missingAnswerAction === 'advance' || openedu.missingAnswerAction === 'alert') {
-                next.openedu.missingAnswerAction = openedu.missingAnswerAction;
-            }
-            next.openedu.autoAdvanceDelayMs = Math.max(500, toNumberOrFallback(openedu.autoAdvanceDelayMs, next.openedu.autoAdvanceDelayMs));
-        }
-
         if (source.onboarding && typeof source.onboarding === 'object') {
             next.onboarding.privacyAccepted = Boolean(source.onboarding.privacyAccepted);
             next.onboarding.allowTechnicalDataCollection = source.onboarding.allowTechnicalDataCollection !== false;
             next.onboarding.completed = Boolean(source.onboarding.completed);
-            next.onboarding.moodleOnly = Boolean(source.onboarding.moodleOnly);
+            next.onboarding.moodleOnly = true;
         }
 
         if (source.ui && typeof source.ui === 'object') {
-            if (['openedu', 'moodle', 'stats', 'diagnostics'].includes(source.ui.lastTab)) {
+            if (['moodle', 'stats', 'diagnostics'].includes(source.ui.lastTab)) {
                 next.ui.lastTab = source.ui.lastTab;
-            }
-        }
-
-        if (source.diagnostics && typeof source.diagnostics === 'object') {
-            next.diagnostics.openeduDebugOverlay = Boolean(source.diagnostics.openeduDebugOverlay);
-        }
-
-        const defaultOpeneduUrl = buildConfig.openeduApiBaseUrl || DEFAULT_SETTINGS.backend.openedu.apiBaseUrl;
-        const defaultMoodleUrl = buildConfig.moodleApiBaseUrl || DEFAULT_SETTINGS.backend.moodle.apiBaseUrl;
-        const openeduTokenMissing = !next.backend.openedu.apiToken;
-        const onboardingIncomplete = !next.onboarding.completed;
-        if (
-            onboardingIncomplete
-            && openeduTokenMissing
-            && defaultOpeneduUrl
-            && defaultOpeneduUrl !== defaultMoodleUrl
-            && next.backend.openedu.apiBaseUrl === defaultMoodleUrl
-        ) {
-            next.backend.openedu.apiBaseUrl = defaultOpeneduUrl;
-        }
-        if (next.onboarding.moodleOnly && !next.backend.openedu.apiToken) {
-            next.activePlatform = 'moodle';
-            if (next.ui.lastTab === 'openedu') {
-                next.ui.lastTab = 'moodle';
             }
         }
 
@@ -275,22 +186,17 @@
             }
             migrated.onboarding.privacyAccepted = Boolean(legacy.privacyPolicyAcceptedByUser);
             migrated.onboarding.allowTechnicalDataCollection = legacy.allowTechnicalDataCollection !== false;
-            migrated.onboarding.completed = Boolean(legacy.privacyPolicyAcceptedByUser && legacy.backend?.apiToken);
-            migrated.onboarding.moodleOnly = false;
+            migrated.onboarding.completed = Boolean(legacy.privacyPolicyAcceptedByUser);
+            migrated.onboarding.moodleOnly = true;
             if (legacy.backend && typeof legacy.backend === 'object') {
                 if (typeof legacy.backend.apiBaseUrl === 'string' && legacy.backend.apiBaseUrl.trim().length > 0) {
-                    const normalizedUrl = legacy.backend.apiBaseUrl.trim().replace(/\/$/, '');
-                    migrated.backend.moodle.apiBaseUrl = normalizedUrl;
-                    migrated.backend.openedu.apiBaseUrl = normalizedUrl;
+                    migrated.backend.moodle.apiBaseUrl = legacy.backend.apiBaseUrl.trim().replace(/\/$/, '');
                 }
                 if (typeof legacy.backend.apiToken === 'string') {
-                    const token = legacy.backend.apiToken.trim();
-                    migrated.backend.moodle.apiToken = token;
-                    migrated.backend.openedu.apiToken = token;
+                    migrated.backend.moodle.apiToken = legacy.backend.apiToken.trim();
                 }
-                const timeoutMs = Math.max(1000, toNumberOrFallback(legacy.backend.requestTimeoutMs, migrated.backend.openedu.requestTimeoutMs));
+                const timeoutMs = Math.max(1000, toNumberOrFallback(legacy.backend.requestTimeoutMs, migrated.backend.moodle.requestTimeoutMs));
                 migrated.backend.moodle.requestTimeoutMs = timeoutMs;
-                migrated.backend.openedu.requestTimeoutMs = timeoutMs;
             }
             migrated.moodle.autoSolving = Boolean(legacy.autoSolving);
 
@@ -338,15 +244,14 @@
     }
 
     async function clearBackendApiBaseUrl(platform) {
-        const selected = platform === 'moodle' ? 'moodle' : 'openedu';
         const payload = await storageGet(STORAGE_KEY);
         const raw = payload[STORAGE_KEY] && typeof payload[STORAGE_KEY] === 'object'
             ? deepClone(payload[STORAGE_KEY])
             : {};
 
         if (raw.backend && typeof raw.backend === 'object') {
-            if (raw.backend[selected] && typeof raw.backend[selected] === 'object') {
-                delete raw.backend[selected].apiBaseUrl;
+            if (raw.backend.moodle && typeof raw.backend.moodle === 'object') {
+                delete raw.backend.moodle.apiBaseUrl;
             }
 
             // Legacy shape fallback where backend settings were shared.
@@ -435,8 +340,7 @@
 
     function getBackendByPlatform(settings, platform) {
         const normalized = normalizeSettings(settings);
-        const selected = platform === 'moodle' ? 'moodle' : 'openedu';
-        return deepClone(normalized.backend[selected]);
+        return deepClone(normalized.backend.moodle);
     }
 
     global.ParamExtMoodleQueue = {

@@ -17,19 +17,18 @@
 
     function defaultSettings() {
         return {
-            activePlatform: 'openedu',
+            activePlatform: 'moodle',
             backend: {
-                moodle: { apiBaseUrl: 'https://syncshare.naloaty.me/api', apiToken: '', requestTimeoutMs: 4000 },
-                openedu: { apiBaseUrl: 'https://paramext.ruka.me/api', apiToken: '', requestTimeoutMs: 4000 }
+                moodle: { apiBaseUrl: 'https://syncshare.naloaty.me/api', apiToken: '', requestTimeoutMs: 4000 }
             },
             onboarding: {
                 privacyAccepted: false,
                 allowTechnicalDataCollection: true,
                 completed: false,
-                moodleOnly: false
+                moodleOnly: true
             },
             ui: {
-                lastTab: 'openedu'
+                lastTab: 'moodle'
             },
             moodle: {
                 mode: 'wand',
@@ -38,24 +37,7 @@
                 autoSolving: false,
                 hideWidgetByDefault: false
             },
-            openedu: {
-                mode: 'stick',
-                backendVersion: 'v2',
-                stickHotkey: 'Alt+KeyS',
-                autoAdvanceEnabled: false,
-                activeTabRefreshEnabled: true,
-                activeTabPostSubmitRefreshEnabled: false,
-                autoAdvanceDelayMs: 1800,
-                requiredCompletionOnly: true,
-                showFallbackStats: true,
-                autoUseSimilarAnswers: false,
-                autoUseFallbackAnswers: false,
-                autoCheckAnswers: false,
-                missingAnswerAction: 'stop'
-            },
-            diagnostics: {
-                openeduDebugOverlay: false
-            }
+            diagnostics: {}
         };
     }
 
@@ -68,7 +50,6 @@
         });
         settings.onboarding.completed = Boolean(
             settings.onboarding.privacyAccepted
-            && (settings.onboarding.moodleOnly || settings.backend?.openedu?.apiToken)
         );
 
         const legacy = Object.assign({}, payload[LEGACY_KEY] || {}, {

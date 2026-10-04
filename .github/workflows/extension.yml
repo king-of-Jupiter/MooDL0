@@ -32,15 +32,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Python checks in venv
-        run: |
-          python -m venv .venv
-          . .venv/bin/activate
-          pip install -r python/requirements.txt
-          python -m compileall -q python/app
 
   package:
     runs-on: ubuntu-latest
@@ -61,7 +52,6 @@ jobs:
           echo "sha=${{ github.sha }}"
       - name: Build extension zip
         env:
-          OPENEDU_API_BASE_URL: ${{ vars.OPENEDU_API_BASE_URL }}
           MOODLE_API_BASE_URL: ${{ vars.MOODLE_API_BASE_URL }}
           BOT_LINK: ${{ vars.BOT_LINK }}
           REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}

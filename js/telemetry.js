@@ -120,7 +120,7 @@
             platform: getPlatformFromScope(scope, 'unknown'),
             extensionVersion: safeGetExtensionVersion(),
             buildId: String(buildConfig.buildId || 'local-dev'),
-            parserVersion: String(buildConfig.parserVersion || 'openedu-parser-v2'),
+            parserVersion: String(buildConfig.parserVersion || 'moodle-v1'),
             clientId,
             sessionId: String(Date.now()),
             channel: String(buildConfig.buildChannel || 'local')
@@ -170,26 +170,17 @@
             if (scope.includes('moodle')) {
                 return 'moodle';
             }
-            if (scope.includes('openedu')) {
-                return 'openedu';
-            }
         }
-        return activePlatform === 'moodle' ? 'moodle' : 'openedu';
+        return 'moodle';
     }
 
     function pickBackendConfig(settings, scope) {
-        const platform = getPlatformFromScope(scope, settings?.activePlatform);
-
         if (global.ParamExtSettings && typeof global.ParamExtSettings.getBackendByPlatform === 'function') {
-            return global.ParamExtSettings.getBackendByPlatform(settings, platform);
+            return global.ParamExtSettings.getBackendByPlatform(settings, 'moodle');
         }
 
         const backend = settings?.backend || {};
-        if (backend.moodle || backend.openedu) {
-            return platform === 'moodle' ? (backend.moodle || {}) : (backend.openedu || {});
-        }
-
-        return backend;
+        return backend.moodle || backend;
     }
 
     async function flushQueue(scope) {
