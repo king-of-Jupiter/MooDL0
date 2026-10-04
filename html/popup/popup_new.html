@@ -54,9 +54,19 @@
                 <label class="check-row" id="moodleAutoFinishRow"><input type="checkbox" id="moodleAutoFinishAttempt"><span>Переходить к итогам после последней страницы</span></label>
                 <label class="check-row dependent" id="moodleAutoSubmitRow"><input type="checkbox" id="moodleAutoSubmitAttempt"><span>Автоматически отправлять попытку</span></label>
                 <div class="option-block">
-                    <label class="field"><span>Очередь тестов Moodle (.txt, одна ссылка на строку)</span><input type="file" id="moodleQueueFile" accept=".txt,text/plain"></label>
+                    <label class="field"><span>Ссылки на тесты (по одной на строку)</span><textarea id="moodleQueueTextarea" rows="3" placeholder="https://site.ru/mod/quiz/view.php?id=123"></textarea></label>
+                    <div class="action-row">
+                        <button type="button" id="moodleQueueAddText" class="btn btn-sm btn-outline-dark">Добавить из поля</button>
+                        <button type="button" id="moodleQueueAddCurrent" class="btn btn-sm btn-outline-dark">Добавить текущую вкладку</button>
+                    </div>
+                    <ul id="moodleQueueList" class="queue-list"></ul>
+                    <div class="action-row">
+                        <button type="button" id="moodleQueueImportBtn" class="btn btn-sm btn-outline-secondary">Импорт из .txt</button>
+                        <input type="file" id="moodleQueueFile" accept=".txt,text/plain" class="hidden">
+                        <button type="button" id="moodleQueueClear" class="btn btn-sm btn-outline-secondary">Очистить список</button>
+                    </div>
                     <div class="action-row"><button type="button" id="moodleQueueStart" class="btn btn-sm btn-success">Запустить очередь</button><button type="button" id="moodleQueueStop" class="btn btn-sm btn-danger">Остановить очередь</button></div>
-                    <p class="queue-note">Очередь принудительно завершает и отправляет попытки. При отсутствии ответов или запроса ручного ввода останавливается.</p>
+                    <p class="queue-note">Ссылки должны вести на тесты одного сайта. Очередь принудительно завершает и отправляет попытки. При отсутствии ответов или запроса ручного ввода останавливается.</p>
                     <p id="moodleQueueStatus" role="status">Очередь не запущена</p>
                 </div>
                 <label class="field">

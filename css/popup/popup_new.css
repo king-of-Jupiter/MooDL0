@@ -242,6 +242,7 @@ body {
 
 .field input,
 .field select,
+.field textarea,
 #backendApiToken,
 #backendApiBaseUrl {
     width: 100%;
@@ -252,6 +253,12 @@ body {
     background: #fff;
     color: #141922;
     font-size: 12px;
+}
+
+.field textarea {
+    resize: vertical;
+    font-family: monospace;
+    overflow-wrap: anywhere;
 }
 
 .hotkey-input {
@@ -291,6 +298,53 @@ body {
 
 #moodleQueueStatus {
     font-weight: 700;
+}
+
+.queue-list {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 132px;
+    overflow-y: auto;
+}
+
+.queue-list li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    line-height: 1.35;
+    background: #f4f6fa;
+    border-radius: 6px;
+    padding: 4px 6px;
+}
+
+.queue-list li span {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow-wrap: anywhere;
+}
+
+.queue-list li button {
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+    color: #b42318;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+}
+
+.queue-list .queue-empty {
+    background: transparent;
+    color: #98a2b3;
+    padding-left: 0;
 }
 
 .action-row,

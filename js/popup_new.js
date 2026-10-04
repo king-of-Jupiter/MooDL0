@@ -42,6 +42,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         moodleAutoSubmitAttempt: $('moodleAutoSubmitAttempt'),
         moodleAutoSubmitRow: $('moodleAutoSubmitRow'),
         moodleQueueFile: $('moodleQueueFile'),
+        moodleQueueImportBtn: $('moodleQueueImportBtn'),
+        moodleQueueTextarea: $('moodleQueueTextarea'),
+        moodleQueueAddText: $('moodleQueueAddText'),
+        moodleQueueAddCurrent: $('moodleQueueAddCurrent'),
+        moodleQueueClear: $('moodleQueueClear'),
+        moodleQueueList: $('moodleQueueList'),
         moodleQueueStart: $('moodleQueueStart'),
         moodleQueueStop: $('moodleQueueStop'),
         moodleQueueStatus: $('moodleQueueStatus'),
@@ -410,29 +416,177 @@ document.addEventListener('DOMContentLoaded', async () => {
             : (queue?.error || (!queue ? 'Очередь не запущена' : (queue.index === queue.links.length ? `Готово: ${queue.index} из ${queue.links.length}` : 'Очередь остановлена')));
     }
 
-    refs.moodleQueueStart.addEventListener('click', async () => {
+    const QUEUE_DRAFT_KEY = 'paramExtMoodleQueueDraft';
+    let collectedLinks = [];
+
+    function parseQuizLink(line) {
+        const url = new URL(line);
+        if (!/^https?:$/.test(url.protocol) || !/\/mod\/quiz\/view\.php$/.test(url.pathname)
+            || !/^\d+$/.test(url.searchParams.get('id') || '')) {
+            throw new Error('Некорректная ссылка: ' + line);
+        }
+        url.hash = '';
+        return url.href;
+    }
+
+    function addLinksToCollection(lines) {
+        const fresh = [];
+        let skipped = 0;
+        for (const line of lines) {
+            try {
+                const href = parseQuizLink(line);
+                if (collectedLinks.includes(href) || fresh.includes(href)) {
+                    skipped += 1;
+                    continue;
+                }
+                fresh.push(href);
+            } catch (_) {
+                throw new Error('Некорректная ссылка: ' + line);
+            }
+        }
+        if (!fresh.length) {
+            return { added: 0, skipped };
+        }
+        const all = collectedLinks.concat(fresh);
+        const origin = new URL(all[0]).origin;
+        if (!all.every((href) => new URL(href).origin === origin)) {
+            throw new Error('Нужны ссылки на тесты одного сайта.');
+        }
+        collectedLinks = all;
+        return { added: fresh.length, skipped };
+    }
+
+    async function persistCollectedLinks() {
+        await chrome.storage.local.set({ [QUEUE_DRAFT_KEY]: collectedLinks });
+        renderCollectedLinks();
+    }
+
+    function renderCollectedLinks() {
+        refs.moodleQueueList.innerHTML = '';
+        if (!collectedLinks.length) {
+            const empty = document.createElement('li');
+            empty.className = 'queue-empty';
+            empty.textContent = 'Список пуст — добавьте ссылки выше.';
+            refs.moodleQueueList.appendChild(empty);
+            return;
+        }
+        collectedLinks.forEach((href, index) => {
+            const item = document.createElement('li');
+            const label = document.createElement('span');
+            label.textContent = (index + 1) + '. ' + href;
+            label.title = href;
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.textContent = '×';
+            remove.title = 'Убрать из списка';
+            remove.setAttribute('aria-label', 'Убрать ссылку ' + (index + 1));
+            remove.addEventListener('click', async () => {
+                collectedLinks.splice(index, 1);
+                await persistCollectedLinks();
+            });
+            item.appendChild(label);
+            item.appendChild(remove);
+            refs.moodleQueueList.appendChild(item);
+        });
+    }
+
+    async function loadCollectedLinks() {
+        try {
+            const stored = (await chrome.storage.local.get(QUEUE_DRAFT_KEY))[QUEUE_DRAFT_KEY];
+            collectedLinks = Array.isArray(stored)
+                ? stored.filter((href) => {
+                    try {
+                        return parseQuizLink(String(href)) === String(href);
+                    } catch (_) {
+                        return false;
+                    }
+                })
+                : [];
+        } catch (_) {
+            collectedLinks = [];
+        }
+        renderCollectedLinks();
+    }
+
+    refs.moodleQueueAddText.addEventListener('click', async () => {
+        const lines = refs.moodleQueueTextarea.value.split(/\r?\n/).map((line) => line.trim())
+            .filter((line) => line && !line.startsWith('#'));
+        if (!lines.length) {
+            refs.moodleQueueStatus.textContent = 'Вставьте ссылки в поле выше.';
+            return;
+        }
+        try {
+            const { added, skipped } = addLinksToCollection(lines);
+            await persistCollectedLinks();
+            refs.moodleQueueTextarea.value = '';
+            refs.moodleQueueStatus.textContent = added > 0
+                ? `Добавлено: ${added} из ${lines.length}` + (skipped ? ` (дубли пропущены: ${skipped})` : '') + `. Всего в списке: ${collectedLinks.length}.`
+                : 'Все эти ссылки уже есть в списке.';
+        } catch (error) {
+            refs.moodleQueueStatus.textContent = error.message;
+        }
+    });
+
+    refs.moodleQueueAddCurrent.addEventListener('click', async () => {
+        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+        const url = tabs[0]?.url || '';
+        if (!url || !/^https?:/.test(url)) {
+            refs.moodleQueueStatus.textContent = 'Не удалось прочитать адрес текущей вкладки.';
+            return;
+        }
+        const clean = url.split('#')[0];
+        try {
+            const { added } = addLinksToCollection([clean]);
+            await persistCollectedLinks();
+            refs.moodleQueueStatus.textContent = added > 0
+                ? `Текущая вкладка добавлена. Всего в списке: ${collectedLinks.length}.`
+                : 'Эта вкладка уже есть в списке.';
+        } catch (_) {
+            refs.moodleQueueStatus.textContent = 'Текущая вкладка — не страница теста Moodle (нужна ссылка вида …/mod/quiz/view.php?id=...).';
+        }
+    });
+
+    refs.moodleQueueImportBtn.addEventListener('click', () => {
+        refs.moodleQueueFile.click();
+    });
+
+    refs.moodleQueueFile.addEventListener('change', async () => {
         const file = refs.moodleQueueFile.files?.[0];
-        if (!file || !/\.txt$/i.test(file.name)) {
-            refs.moodleQueueStatus.textContent = 'Выберите файл .txt';
+        refs.moodleQueueFile.value = '';
+        if (!file) {
+            return;
+        }
+        if (!/\.txt$/i.test(file.name)) {
+            refs.moodleQueueStatus.textContent = 'Нужен файл .txt.';
             return;
         }
         const lines = (await file.text()).split(/\r?\n/).map((line) => line.trim())
             .filter((line) => line && !line.startsWith('#'));
-        let links;
+        if (!lines.length) {
+            refs.moodleQueueStatus.textContent = 'В файле нет ссылок.';
+            return;
+        }
         try {
-            links = lines.map((line) => {
-                const url = new URL(line);
-                if (!/^https?:$/.test(url.protocol) || !/\/mod\/quiz\/view\.php$/.test(url.pathname)
-                    || !/^\d+$/.test(url.searchParams.get('id') || '')) {
-                    throw new Error('Некорректная ссылка: ' + line);
-                }
-                return url.href;
-            });
-            if (!links.length || !links.every((url) => new URL(url).origin === new URL(links[0]).origin)) {
-                throw new Error('Нужны ссылки на тесты одного сайта, по одной на строку.');
-            }
+            const { added, skipped } = addLinksToCollection(lines);
+            await persistCollectedLinks();
+            refs.moodleQueueStatus.textContent = added > 0
+                ? `Импортировано: ${added} из ${lines.length}` + (skipped ? ` (дубли пропущены: ${skipped})` : '') + `. Всего в списке: ${collectedLinks.length}.`
+                : 'Все ссылки из файла уже есть в списке.';
         } catch (error) {
             refs.moodleQueueStatus.textContent = error.message;
+        }
+    });
+
+    refs.moodleQueueClear.addEventListener('click', async () => {
+        collectedLinks = [];
+        await persistCollectedLinks();
+        await showMoodleQueueStatus();
+    });
+
+    refs.moodleQueueStart.addEventListener('click', async () => {
+        const links = collectedLinks.slice();
+        if (!links.length) {
+            refs.moodleQueueStatus.textContent = 'Список пуст — добавьте ссылки выше или импортируйте .txt.';
             return;
         }
         if (saveTimer) {
@@ -477,6 +631,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         await showMoodleQueueStatus();
     });
+    await loadCollectedLinks();
     showMoodleQueueStatus();
 
     [
