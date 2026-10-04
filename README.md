@@ -11,6 +11,8 @@
 </p>
 
 > **MooDL0** — расширенная версия SyncShare для автоматизации тестов на **Moodle**.
+>
+> Форк проекта [KOSFin/MooDuSh](https://github.com/KOSFin/MooDuSh).
 
 ---
 
@@ -36,7 +38,7 @@
 
 ```bash
 git clone https://github.com/king-of-Jupiter/MooDL0.git
-cd MooDL0-from-syncshare
+cd MooDL0
 npm ci
 npm run build:extension
 ```
@@ -216,5 +218,7 @@ MooDL0/
 **Made with ❤️ by MooDL0 contributors**
 
 [Оригинальный SyncShare](https://chromewebstore.google.com/detail/syncshare/lngijbnmdkejbgnkakeiapeppbpaapib?hl=ru&utm_source=ext_sidebar)
+
+[Проект, от которого отфоркован MooDL0](https://github.com/KOSFin/MooDuSh)
 
 </div>
