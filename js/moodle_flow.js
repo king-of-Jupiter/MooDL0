@@ -20,9 +20,32 @@
     const attemptId = new URL(location.href).searchParams.get('attempt');
     if (isReview) {
         if (active) {
-            await window.ParamExtMoodleQueue.request({ type: 'MOODLE_QUEUE_REVIEW' });
+            await window.ParamExtMoodleQueue.request({ type: 'MOODLE_QUEUE_REVIEW', result: readReviewResult() });
         }
         return;
+    }
+
+    function readReviewResult() {
+        const clean = (text) => String(text || '').replace(/\s+/g, ' ').trim().slice(0, 120);
+        let grade = '';
+        let marks = '';
+        document.querySelectorAll('table.quizreviewsummary tr').forEach((row) => {
+            const head = clean(row.querySelector('th')?.textContent).toLowerCase();
+            const value = clean(row.querySelector('td')?.textContent);
+            if (!value) {
+                return;
+            }
+            if (/оценка|grade/.test(head)) {
+                grade = value;
+            } else if (/балл|marks/.test(head)) {
+                marks = value;
+            }
+        });
+        const crumbs = Array.from(document.querySelectorAll('.breadcrumb-item'));
+        const name = clean(document.querySelector('.page-header-headings h1')?.textContent)
+            || clean(crumbs[crumbs.length - 1]?.textContent)
+            || clean(document.title);
+        return { grade: grade || marks, name };
     }
 
     if (isView) {
@@ -64,6 +87,7 @@
         return;
     }
     const settings = await window.ParamExtSettings.getSettings();
+    window.ParamExtI18n?.setLanguage(settings.ui?.language);
     const markerKey = 'paramExtMoodleFinishAttempt';
     let marker = null;
     try {
@@ -80,11 +104,19 @@
     if (!shouldSubmit) {
         return;
     }
-    if (document.querySelector('.quizsummaryofattempt tr.notyetanswered, .quizsummaryofattempt tr.invalidanswer, .quizsummaryofattempt tr.notanswered')) {
-        if (active) {
-            await window.ParamExtMoodleQueue.request({ type: 'MOODLE_QUEUE_ERROR', error: 'В тесте остались вопросы без ответа. Очередь остановлена.' });
-        }
+    const unansweredRows = document.querySelectorAll('.quizsummaryofattempt tr.notyetanswered, .quizsummaryofattempt tr.invalidanswer, .quizsummaryofattempt tr.notanswered');
+    if (active && unansweredRows.length) {
+        await window.ParamExtMoodleQueue.request({ type: 'MOODLE_QUEUE_ERROR', error: 'В тесте остались вопросы без ответа. Очередь остановлена.' });
         return;
+    }
+    if (!active) {
+        if (settings.moodle.confirmBeforeSubmit === false) {
+            if (unansweredRows.length) {
+                return;
+            }
+        } else if (!(await confirmSubmit(unansweredRows))) {
+            return;
+        }
     }
     const form = document.querySelector('form#frm-finishattempt');
     const button = form?.querySelector('.btn-finishattempt button, button[type="submit"], input[type="submit"]');
@@ -101,4 +133,100 @@
         return;
     }
     HTMLFormElement.prototype.submit.call(form);
+
+    // Pre-submit check for the non-queue auto mode: show what was answered
+    // and by what. Submits by itself after a countdown only when nothing is
+    // missing or doubtful; otherwise waits for the user.
+    function confirmSubmit(unanswered) {
+        const tr = (text, ...args) => (window.ParamExtI18n ? window.ParamExtI18n.t(text, ...args) : text.replace(/\{(\d+)\}/g, (_, i) => args[i]));
+        const assist = window.ParamExtAnswerAssist;
+        const report = assist ? assist.readReport(attemptId) : { questions: {}, seen: [] };
+        const numberOf = (row) => String(row.querySelector('td, th')?.textContent || '').trim();
+        const unansweredNumbers = Array.from(unanswered).map(numberOf).filter(Boolean);
+        const total = document.querySelectorAll('.quizsummaryofattempt tbody tr').length || report.seen.length;
+        const low = [];
+        const missing = [];
+        report.seen.forEach((qno) => {
+            const entry = report.questions[qno];
+            if (!entry || entry.status === 'none') {
+                missing.push(qno);
+            } else if (entry.status === 'low') {
+                low.push(qno);
+            }
+        });
+        const answeredByExtension = Object.values(report.questions).filter((entry) => entry.status === 'applied').length;
+        const clean = !unansweredNumbers.length && !low.length && !missing.length;
+
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'moodl0-overlay';
+            const dialog = document.createElement('div');
+            dialog.className = 'moodl0-dialog';
+            dialog.setAttribute('role', 'dialog');
+            dialog.setAttribute('aria-modal', 'true');
+            const title = document.createElement('h2');
+            title.textContent = tr('Проверка перед отправкой');
+            dialog.appendChild(title);
+            const line = (text, className) => {
+                const p = document.createElement('p');
+                p.textContent = text;
+                if (className) {
+                    p.className = className;
+                }
+                dialog.appendChild(p);
+            };
+            line(tr('Ответы вставлены расширением: {0} из {1}', answeredByExtension, total || '?'), clean ? 'moodl0-ok' : '');
+            if (unansweredNumbers.length) {
+                line(tr('Без ответа в Moodle: вопросы {0}', unansweredNumbers.join(', ')), 'moodl0-bad');
+            }
+            if (missing.length) {
+                line(tr('Нет данных: вопросы {0}', missing.join(', ')), 'moodl0-bad');
+            }
+            if (low.length) {
+                line(tr('Низкая уверенность (не вставлены): вопросы {0}', low.join(', ')), 'moodl0-warn');
+            }
+            const countdown = document.createElement('p');
+            dialog.appendChild(countdown);
+            const actions = document.createElement('div');
+            actions.className = 'moodl0-actions';
+            const stopBtn = document.createElement('button');
+            stopBtn.type = 'button';
+            stopBtn.textContent = tr('Остановиться');
+            const sendBtn = document.createElement('button');
+            sendBtn.type = 'button';
+            sendBtn.className = 'moodl0-primary';
+            sendBtn.textContent = clean ? tr('Отправить') : tr('Отправить всё равно');
+            actions.append(stopBtn, sendBtn);
+            dialog.appendChild(actions);
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+
+            let timer = 0;
+            const finish = (result) => {
+                clearInterval(timer);
+                overlay.remove();
+                resolve(result);
+            };
+            stopBtn.addEventListener('click', () => finish(false));
+            sendBtn.addEventListener('click', () => finish(true));
+            if (clean) {
+                let left = 10;
+                const render = () => {
+                    countdown.textContent = tr('Автоотправка через {0} с', left);
+                };
+                render();
+                timer = setInterval(() => {
+                    left -= 1;
+                    if (left <= 0) {
+                        finish(true);
+                        return;
+                    }
+                    render();
+                }, 1000);
+            } else {
+                countdown.textContent = tr('Есть проблемы — отправка ждёт вашего решения.');
+            }
+            sendBtn.focus();
+        });
+    }
 })();

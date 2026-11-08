@@ -24,7 +24,8 @@
             moodleOnly: true
         },
         ui: {
-            lastTab: 'moodle'
+            lastTab: 'moodle',
+            language: 'auto'
         },
         moodle: {
             mode: 'wand',
@@ -35,7 +36,13 @@
             autoSolving: false,
             autoFinishAttempt: false,
             autoSubmitAttempt: false,
-            hideWidgetByDefault: false
+            hideWidgetByDefault: false,
+            minConfidence: 0,
+            minVotes: 0,
+            pageDelayMin: 0,
+            pageDelayMax: 0,
+            confirmBeforeSubmit: true,
+            notifyQueue: true
         },
         diagnostics: {}
     };
@@ -47,6 +54,14 @@
     function toNumberOrFallback(value, fallback) {
         const num = Number(value);
         return Number.isFinite(num) ? num : fallback;
+    }
+
+    function clampNumber(value, min, max, fallback) {
+        const num = Number(value);
+        if (!Number.isFinite(num)) {
+            return fallback;
+        }
+        return Math.min(max, Math.max(min, Math.round(num)));
     }
 
     function normalizeHotkey(value, fallback) {
@@ -81,7 +96,7 @@
 
         if (source.moodle && typeof source.moodle === 'object') {
             const moodle = source.moodle;
-            if (moodle.mode === 'wand' || moodle.mode === 'autoInsert' || moodle.mode === 'autoSolve') {
+            if (['wand', 'autoInsert', 'autoSolve', 'highlight'].includes(moodle.mode)) {
                 next.moodle.mode = moodle.mode;
             }
             next.moodle.wandHotkey = normalizeHotkey(moodle.wandHotkey, next.moodle.wandHotkey);
@@ -94,6 +109,12 @@
             next.moodle.autoFinishAttempt = Boolean(moodle.autoFinishAttempt);
             next.moodle.autoSubmitAttempt = Boolean(moodle.autoSubmitAttempt);
             next.moodle.hideWidgetByDefault = Boolean(moodle.hideWidgetByDefault);
+            next.moodle.minConfidence = clampNumber(moodle.minConfidence, 0, 100, 0);
+            next.moodle.minVotes = clampNumber(moodle.minVotes, 0, 100000, 0);
+            next.moodle.pageDelayMin = clampNumber(moodle.pageDelayMin, 0, 600, 0);
+            next.moodle.pageDelayMax = Math.max(next.moodle.pageDelayMin, clampNumber(moodle.pageDelayMax, 0, 600, 0));
+            next.moodle.confirmBeforeSubmit = moodle.confirmBeforeSubmit !== false;
+            next.moodle.notifyQueue = moodle.notifyQueue !== false;
         }
 
         if (source.onboarding && typeof source.onboarding === 'object') {
@@ -106,6 +127,9 @@
         if (source.ui && typeof source.ui === 'object') {
             if (['moodle', 'stats', 'diagnostics'].includes(source.ui.lastTab)) {
                 next.ui.lastTab = source.ui.lastTab;
+            }
+            if (['auto', 'ru', 'en'].includes(source.ui.language)) {
+                next.ui.language = source.ui.language;
             }
         }
 
@@ -124,6 +148,10 @@
             nextBtnText: normalized.moodle.nextButtonText,
             autoSolving: normalized.moodle.autoSolving,
             hideWidgetByDefault: normalized.moodle.hideWidgetByDefault,
+            minConfidence: normalized.moodle.minConfidence,
+            minVotes: normalized.moodle.minVotes,
+            confirmBeforeSubmit: normalized.moodle.confirmBeforeSubmit,
+            language: normalized.ui.language,
             privacyPolicyAcceptedByUser: normalized.onboarding.privacyAccepted,
             allowTechnicalDataCollection: normalized.onboarding.allowTechnicalDataCollection,
             backend: {
@@ -169,7 +197,7 @@
             }
 
             const migrated = deepClone(DEFAULT_SETTINGS);
-            if (legacy.mode === 'wand' || legacy.mode === 'autoInsert' || legacy.mode === 'autoSolve') {
+            if (['wand', 'autoInsert', 'autoSolve', 'highlight'].includes(legacy.mode)) {
                 migrated.moodle.mode = legacy.mode;
             }
             if (typeof legacy.wandKey === 'string' && legacy.wandKey.trim().length > 0) {

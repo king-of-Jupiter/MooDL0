@@ -4,122 +4,226 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MooDL0</title>
-    <link href="../../css/bootstrap.min.css" rel="stylesheet">
     <link href="../../css/popup/popup_new.css" rel="stylesheet">
 </head>
 <body>
     <main class="popup-shell">
         <header class="popup-header">
             <div class="brand">
-                <img src="../../logo_main.png" alt="MooDL0" class="logo" id="mainLogo">
-                <div>
+                <img src="../../logo_main.png" alt="" class="logo" id="mainLogo">
+                <div class="brand-text">
                     <h1>MooDL0</h1>
-                    <p id="headerStatus">Moodle</p>
+                    <p id="headerStatus" class="header-status"><span class="dot" id="headerDot"></span><span id="headerStatusText">Moodle</span></p>
                 </div>
             </div>
             <div class="header-actions">
-                <a href="#" id="telegramChannelLink" class="icon-btn telegram-btn" target="_blank" rel="noopener" title="Telegram-канал MooDL0" aria-label="Telegram-канал MooDL0">
+                <a href="#" id="telegramChannelLink" class="icon-btn" target="_blank" rel="noopener" title="Telegram-канал MooDL0" aria-label="Telegram-канал MooDL0">
                     <img src="../../icons/telegram.png" alt="">
                 </a>
-                <div class="version-pill" id="versionPill">v...</div>
+                <span class="version-pill" id="versionPill">v...</span>
             </div>
         </header>
 
-        <section id="privacyScreen" class="screen">
-            <div class="screen-copy">
-                <span class="screen-kicker">Первый запуск</span>
-                <h2>Нужно принять политику данных</h2>
-                <p>Согласие открывается на отдельной странице расширения. После принятия вернитесь сюда и продолжите настройку.</p>
-            </div>
-            <div class="screen-actions">
-                <button type="button" id="openPrivacyBtn" class="btn btn-dark w-100">Открыть политику</button>
-                <button type="button" id="refreshPrivacyBtn" class="btn btn-outline-dark w-100">Я уже принял</button>
+        <section id="privacyScreen" class="card screen">
+            <span class="kicker">Первый запуск</span>
+            <h2>Нужно принять политику данных</h2>
+            <p>Согласие открывается на отдельной странице расширения. После принятия вернитесь сюда — настройки откроются автоматически.</p>
+            <div class="stack">
+                <button type="button" id="openPrivacyBtn" class="btn btn-primary btn-block">Открыть политику</button>
+                <button type="button" id="refreshPrivacyBtn" class="btn btn-ghost btn-block">Я уже принял</button>
             </div>
         </section>
 
         <section id="appScreen" class="app-screen hidden">
-            <section id="moodleSettings" class="panel tab-panel">
-                <div class="panel-head">
-                    <h2>Moodle</h2>
-                </div>
-                <div class="segmented" role="radiogroup" aria-label="Режим Moodle">
-                    <label><input type="radio" name="moodleMode" value="wand"><span>Палочка</span></label>
-                    <label><input type="radio" name="moodleMode" value="autoInsert"><span>Авто-вставка</span></label>
-                    <label><input type="radio" name="moodleMode" value="autoSolve"><span>Авто-прохождение</span></label>
-                </div>
-                <div id="autoSolveControls" class="action-row hidden">
-                    <button id="btnStart" class="btn btn-sm btn-success" type="button">Старт</button>
-                    <button id="btnStop" class="btn btn-sm btn-danger hidden" type="button">Стоп</button>
-                </div>
-                <label class="check-row" id="moodleAutoFinishRow"><input type="checkbox" id="moodleAutoFinishAttempt"><span>Переходить к итогам после последней страницы</span></label>
-                <label class="check-row dependent" id="moodleAutoSubmitRow"><input type="checkbox" id="moodleAutoSubmitAttempt"><span>Автоматически отправлять попытку</span></label>
-                <div class="option-block">
-                    <label class="field"><span>Ссылки на тесты (по одной на строку)</span><textarea id="moodleQueueTextarea" rows="3" placeholder="https://site.ru/mod/quiz/view.php?id=123"></textarea></label>
-                    <div class="action-row">
-                        <button type="button" id="moodleQueueAddText" class="btn btn-sm btn-outline-dark">Добавить из поля</button>
-                        <button type="button" id="moodleQueueAddCurrent" class="btn btn-sm btn-outline-dark">Добавить текущую вкладку</button>
-                    </div>
-                    <ul id="moodleQueueList" class="queue-list"></ul>
-                    <div class="action-row">
-                        <button type="button" id="moodleQueueImportBtn" class="btn btn-sm btn-outline-secondary">Импорт из .txt</button>
-                        <input type="file" id="moodleQueueFile" accept=".txt,text/plain" class="hidden">
-                        <button type="button" id="moodleQueueClear" class="btn btn-sm btn-outline-secondary">Очистить список</button>
-                    </div>
-                    <div class="action-row"><button type="button" id="moodleQueueStart" class="btn btn-sm btn-success">Запустить очередь</button><button type="button" id="moodleQueueStop" class="btn btn-sm btn-danger">Остановить очередь</button></div>
-                    <p class="queue-note">Ссылки должны вести на тесты одного сайта. Очередь принудительно завершает и отправляет попытки. При отсутствии ответов или запроса ручного ввода останавливается.</p>
-                    <p id="moodleQueueStatus" role="status">Очередь не запущена</p>
-                </div>
-                <label class="field">
-                    <span>Клавиша палочки</span>
-                    <input type="text" id="wandKey" class="hotkey-input" readonly>
-                </label>
-                <label class="check-row">
-                    <input type="checkbox" id="moodleAutoInsertOnLoad">
-                    <span>Вставлять ответы после загрузки</span>
-                </label>
-                <label class="field">
-                    <span>Клавиша вставки ответов</span>
-                    <input type="text" id="moodleInsertKey" class="hotkey-input" readonly>
-                </label>
-                <label class="field">
-                    <span>Текст кнопки далее</span>
-                    <input type="text" id="nextBtnSelector">
-                </label>
-            </section>
+            <nav class="tabs" role="tablist" aria-label="Разделы">
+                <button type="button" class="tab" role="tab" data-tab="solve" id="tab-solve" aria-controls="moodleSettings">Решение</button>
+                <button type="button" class="tab" role="tab" data-tab="queue" id="tab-queue" aria-controls="queuePanel">Очередь <span class="badge" id="queueCountBadge">0</span></button>
+                <button type="button" class="tab" role="tab" data-tab="settings" id="tab-settings" aria-controls="settingsPanel">Настройки</button>
+            </nav>
 
-            <section id="diagnosticsPanel" class="panel tab-panel">
-                <div class="panel-head">
-                    <h2>Подключение и диагностика</h2>
-                    <button type="button" id="updateCheckBtn" class="btn btn-sm btn-outline-dark">Обновления</button>
+            <!-- Решение -->
+            <section id="moodleSettings" class="card tab-panel" role="tabpanel" aria-labelledby="tab-solve" data-panel="solve">
+                <div class="segmented" role="radiogroup" aria-label="Режим Moodle">
+                    <label><input type="radio" name="moodleMode" value="wand"><span><b class="seg-icon" aria-hidden="true">✦</b>Палочка</span></label>
+                    <label><input type="radio" name="moodleMode" value="autoInsert"><span><b class="seg-icon" aria-hidden="true">⇣</b>Авто-вставка</span></label>
+                    <label><input type="radio" name="moodleMode" value="highlight"><span><b class="seg-icon" aria-hidden="true">◎</b>Подсказка</span></label>
+                    <label><input type="radio" name="moodleMode" value="autoSolve"><span><b class="seg-icon" aria-hidden="true">▶</b>Авто-прохождение</span></label>
                 </div>
-                <label class="check-row">
-                    <input type="checkbox" id="customBackendToggle">
-                    <span>Использовать свой backend</span>
-                </label>
-                <div id="customBackendFields" class="hidden">
-                    <label class="field">
-                        <span>Moodle API URL</span>
-                        <input type="text" id="backendApiBaseUrl" placeholder="https://api.example.com">
+                <p class="mode-hint" id="modeHint" aria-live="polite"></p>
+
+                <div id="autoSolveControls" class="run-box hidden">
+                    <div class="run-state">
+                        <span class="dot" id="autoSolveDot"></span>
+                        <span id="autoSolveState">Остановлено</span>
+                    </div>
+                    <button id="btnStart" class="btn btn-success" type="button">▶ Старт</button>
+                    <button id="btnStop" class="btn btn-danger hidden" type="button">■ Стоп</button>
+                </div>
+
+                <div class="options">
+                    <label class="switch-row" id="moodleAutoInsertRow">
+                        <input type="checkbox" id="moodleAutoInsertOnLoad">
+                        <span class="switch" aria-hidden="true"></span>
+                        <span class="switch-text">Вставлять ответы сразу после загрузки<small>Иначе — по горячей клавише вставки</small></span>
+                    </label>
+                    <label class="switch-row" id="moodleAutoFinishRow">
+                        <input type="checkbox" id="moodleAutoFinishAttempt">
+                        <span class="switch" aria-hidden="true"></span>
+                        <span class="switch-text">Переходить к итогам после последней страницы</span>
+                    </label>
+                    <label class="switch-row dependent" id="moodleAutoSubmitRow">
+                        <input type="checkbox" id="moodleAutoSubmitAttempt">
+                        <span class="switch" aria-hidden="true"></span>
+                        <span class="switch-text">Автоматически отправлять попытку<small>Попытка будет отправлена в Moodle</small></span>
+                    </label>
+                    <label class="switch-row dependent" id="confirmBeforeSubmitRow">
+                        <input type="checkbox" id="confirmBeforeSubmit">
+                        <span class="switch" aria-hidden="true"></span>
+                        <span class="switch-text">Проверка перед отправкой<small>Сводка по ответам; без проблем — отправка через 10 с</small></span>
                     </label>
                 </div>
-                <input type="number" id="backendRequestTimeoutMs" class="hidden" min="1000" step="250">
-                <div class="backend-check">
-                    <button type="button" id="backendResetUrlBtn" class="btn btn-outline-secondary">Сбросить URL</button>
-                    <span id="backendPingStatus" class="status-text">Не проверено</span>
+
+                <div class="tuning" id="thresholdBlock">
+                    <div class="tuning-head">Порог уверенности <small>0 — без ограничений</small></div>
+                    <div class="tuning-grid">
+                        <label class="mini-field"><span>Мин. уверенность, %</span><input type="number" id="minConfidence" min="0" max="100" step="5" inputmode="numeric"></label>
+                        <label class="mini-field"><span>Мин. голосов</span><input type="number" id="minVotes" min="0" max="100000" step="1" inputmode="numeric"></label>
+                    </div>
+                    <p class="note">Если ответ не проходит оба порога, он не вставляется, а вопрос подсвечивается для ручной проверки.</p>
                 </div>
-                <div class="diagnostics-list">
-                    <div><span>Backend</span><strong id="backendCompactStatus">Не проверено</strong></div>
-                    <div><span>Update</span><strong id="updateStatus">Не проверено</strong></div>
-                    <div><span>Build</span><strong id="buildStatus">local</strong></div>
+
+                <div class="tuning" id="delayBlock">
+                    <div class="tuning-head">Пауза между страницами, с</div>
+                    <div class="tuning-grid">
+                        <label class="mini-field"><span>от</span><input type="number" id="pageDelayMin" min="0" max="600" step="1" inputmode="numeric"></label>
+                        <label class="mini-field"><span>до</span><input type="number" id="pageDelayMax" min="0" max="600" step="1" inputmode="numeric"></label>
+                    </div>
+                </div>
+
+                <div class="hotkey-hints">
+                    <span>Палочка <kbd id="wandKeyHint">Esc</kbd></span>
+                    <span>Вставка <kbd id="insertKeyHint">Alt + A</kbd></span>
+                    <button type="button" class="link-btn" data-goto="settings">Изменить</button>
                 </div>
             </section>
 
-            <button id="btnSave" class="btn btn-dark w-100" type="button">Сохранить</button>
+            <!-- Очередь -->
+            <section id="queuePanel" class="card tab-panel" role="tabpanel" aria-labelledby="tab-queue" data-panel="queue">
+                <div class="queue-status" id="queueStatusBox">
+                    <p id="moodleQueueStatus" role="status">Очередь не запущена</p>
+                    <div class="progress hidden" id="queueProgress"><span id="queueProgressBar"></span></div>
+                    <button type="button" id="moodleQueueResume" class="btn btn-secondary btn-sm resume-btn hidden">↻ Продолжить</button>
+                </div>
+
+                <label class="field">
+                    <span>Ссылки на тесты — по одной на строку</span>
+                    <textarea id="moodleQueueTextarea" rows="3" placeholder="https://site.ru/mod/quiz/view.php?id=123"></textarea>
+                </label>
+                <div class="action-row">
+                    <button type="button" id="moodleQueueAddText" class="btn btn-secondary" title="Ctrl+Enter">Добавить</button>
+                    <button type="button" id="moodleQueueAddCurrent" class="btn btn-secondary">+ Текущая вкладка</button>
+                    <button type="button" id="moodleQueueAddPage" class="btn btn-secondary" title="Все ссылки на тесты с открытой страницы курса">+ Тесты со страницы</button>
+                </div>
+
+                <div class="list-head">
+                    <span>Список <b id="queueCountLabel">0</b></span>
+                    <span class="list-tools">
+                        <button type="button" id="moodleQueueImportBtn" class="link-btn">Импорт .txt</button>
+                        <input type="file" id="moodleQueueFile" accept=".txt,text/plain" class="hidden">
+                        <button type="button" id="moodleQueueClear" class="link-btn danger">Очистить</button>
+                    </span>
+                </div>
+                <ul id="moodleQueueList" class="queue-list"></ul>
+
+                <button type="button" id="moodleQueueStart" class="btn btn-success btn-block">▶ Запустить очередь</button>
+                <button type="button" id="moodleQueueStop" class="btn btn-danger btn-block hidden">■ Остановить очередь</button>
+                <p class="note">Ссылки — на тесты одного сайта. Очередь сама завершает и отправляет попытки и останавливается, если ответа нет или нужен ручной ввод.</p>
+
+                <details class="history" id="historyBox">
+                    <summary>История <span class="badge" id="historyCount">0</span></summary>
+                    <ul id="historyList" class="history-list"></ul>
+                    <button type="button" id="historyClear" class="link-btn danger">Очистить историю</button>
+                </details>
+            </section>
+
+            <!-- Настройки -->
+            <section id="settingsPanel" class="tab-panel" role="tabpanel" aria-labelledby="tab-settings" data-panel="settings">
+                <div class="card">
+                    <h2 class="card-title">Горячие клавиши</h2>
+                    <label class="field">
+                        <span>Показать / скрыть палочки</span>
+                        <input type="text" id="wandKey" class="hotkey-input" readonly placeholder="Нажмите клавишу…">
+                    </label>
+                    <label class="field">
+                        <span>Вставить ответы</span>
+                        <input type="text" id="moodleInsertKey" class="hotkey-input" readonly placeholder="Нажмите клавишу…">
+                    </label>
+                    <p class="note">Кликните в поле и нажмите сочетание. Backspace — очистить.</p>
+                    <label class="field">
+                        <span>Текст кнопки «Далее» в Moodle</span>
+                        <input type="text" id="nextBtnSelector">
+                    </label>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Общие</h2>
+                    <label class="field">
+                        <span>Язык</span>
+                        <select id="uiLanguage">
+                            <option value="auto">Как в браузере</option>
+                            <option value="ru">Русский</option>
+                            <option value="en">English</option>
+                        </select>
+                    </label>
+                    <label class="switch-row">
+                        <input type="checkbox" id="notifyQueue">
+                        <span class="switch" aria-hidden="true"></span>
+                        <span class="switch-text">Уведомления об очереди<small>Когда очередь завершена или остановилась</small></span>
+                    </label>
+                    <div class="action-row">
+                        <button type="button" id="exportBtn" class="btn btn-secondary btn-sm">Экспорт настроек</button>
+                        <button type="button" id="importBtn" class="btn btn-secondary btn-sm">Импорт</button>
+                        <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+                    </div>
+                    <p class="note" id="transferStatus">Файл содержит настройки и список ссылок очереди.</p>
+                </div>
+
+                <div class="card" id="diagnosticsPanel">
+                    <div class="card-head">
+                        <h2 class="card-title">Подключение</h2>
+                        <button type="button" id="updateCheckBtn" class="btn btn-secondary btn-sm">Проверить обновления</button>
+                    </div>
+                    <div class="diagnostics-list">
+                        <div><span>Сервер</span><strong id="backendCompactStatus">Не проверено</strong></div>
+                        <div><span>Обновления</span><strong id="updateStatus">Не проверено</strong></div>
+                        <div><span>Сборка</span><strong id="buildStatus">local</strong></div>
+                    </div>
+                    <label class="switch-row">
+                        <input type="checkbox" id="customBackendToggle">
+                        <span class="switch" aria-hidden="true"></span>
+                        <span class="switch-text">Свой сервер (backend)</span>
+                    </label>
+                    <div id="customBackendFields" class="hidden">
+                        <label class="field">
+                            <span>Moodle API URL</span>
+                            <input type="text" id="backendApiBaseUrl" placeholder="https://api.example.com">
+                        </label>
+                        <div class="action-row">
+                            <button type="button" id="backendResetUrlBtn" class="btn btn-secondary btn-sm">Сбросить URL</button>
+                            <span id="backendPingStatus" class="status-text">Не проверено</span>
+                        </div>
+                    </div>
+                    <input type="number" id="backendRequestTimeoutMs" class="hidden" min="1000" step="250">
+                </div>
+            </section>
+
+            <div class="save-indicator" id="btnSave" role="status" aria-live="polite">Изменения сохраняются автоматически</div>
         </section>
     </main>
 
     <script src="../../js/build_config.js"></script>
     <script src="../../js/platform_settings.js"></script>
+    <script src="../../js/i18n.js"></script>
     <script src="../../js/telemetry.js"></script>
     <script src="../../js/popup_new.js"></script>
 </body>

@@ -44,6 +44,9 @@
    "invalidLoginOrPassword": {
       "message": "Неверный логин или пароль"
    },
+   "magicMenuNoData": {
+      "message": "По этому вопросу пока нет данных"
+   },
    "magicMenuSubmissions": {
       "message": "Статистика"
    },

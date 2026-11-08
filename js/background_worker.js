@@ -85,7 +85,53 @@ function openPrivacyPolicyTabGuarded(url, callback) {
 
 installPrivacyPolicyTabsGuard();
 importScripts('background.js');
+importScripts('build_config.js', 'platform_settings.js', 'i18n.js');
 importScripts('moodle_queue.js');
+
+// Toolbar badge: queue progress ("2/5"), "!" after a queue error,
+// "ON" while auto-solving is enabled.
+const BADGE_QUEUE_KEY = 'paramExtMoodleQueue';
+const BADGE_SETTINGS_KEY = 'paramExtPlatformSettingsV2';
+
+async function refreshBadge() {
+    const action = chrome.action;
+    if (!action || typeof action.setBadgeText !== 'function') {
+        return;
+    }
+    try {
+        const stored = await chrome.storage.local.get([BADGE_QUEUE_KEY, BADGE_SETTINGS_KEY]);
+        const queue = stored[BADGE_QUEUE_KEY];
+        const moodle = stored[BADGE_SETTINGS_KEY]?.moodle || {};
+        let text = '';
+        let color = '#16a34a';
+        let title = 'MooDL0';
+        if (queue?.active && Array.isArray(queue.links)) {
+            text = (queue.index + 1) + '/' + queue.links.length;
+            title = 'MooDL0 — ' + text;
+        } else if (queue && !queue.active && queue.error) {
+            text = '!';
+            color = '#dc2626';
+            title = 'MooDL0 — ' + queue.error;
+        } else if (moodle.mode === 'autoSolve' && moodle.autoSolving) {
+            text = 'ON';
+        }
+        await action.setBadgeText({ text });
+        await action.setBadgeBackgroundColor({ color });
+        if (typeof action.setBadgeTextColor === 'function') {
+            await action.setBadgeTextColor({ color: '#ffffff' });
+        }
+        await action.setTitle({ title });
+    } catch (_) {
+        // Badge is cosmetic.
+    }
+}
+
+chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && (changes[BADGE_QUEUE_KEY] || changes[BADGE_SETTINGS_KEY])) {
+        refreshBadge();
+    }
+});
+refreshBadge();
 
 const PARAMEXT_SETTINGS_KEY = 'paramExtPlatformSettingsV2';
 const PARAMEXT_LEGACY_SETTINGS_KEY = 'paramExtSettings';

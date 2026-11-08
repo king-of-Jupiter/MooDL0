@@ -44,6 +44,9 @@
    "invalidLoginOrPassword": {
       "message": "Wrong login or password"
    },
+   "magicMenuNoData": {
+      "message": "No answers for this question yet"
+   },
    "magicMenuSubmissions": {
       "message": "Submissions"
    },

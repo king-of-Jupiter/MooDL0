@@ -72,6 +72,7 @@ jobs:
           name: moodl0-extension
           path: |
             dist/moodl0-extension.zip
+            dist/moodl0-extension-firefox.zip
             dist/release-manifest.json
 
   release:
@@ -143,4 +144,5 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             dist/moodl0-extension.zip
+            dist/moodl0-extension-firefox.zip
             dist/release-manifest.json

@@ -51,6 +51,16 @@ npm run build:extension
 4. Выберите папку с файлами MooDL0 (где лежит `manifest.json`)
 5. Готово — иконка MooDL0 появится на панели расширений
 
+### Firefox (128+)
+
+Сборка `npm run build:extension` создаёт также `dist/moodl0-extension-firefox.zip` (и распакованную папку `dist/firefox/`).
+
+1. Откройте `about:debugging#/runtime/this-firefox`
+2. Нажмите **Загрузить временное дополнение…**
+3. Выберите `manifest.json` в папке `dist/firefox/` (или сам zip)
+
+Временное дополнение удаляется при перезапуске Firefox. Для постоянной установки zip нужно подписать через [addons.mozilla.org](https://addons.mozilla.org/developers/) (можно как unlisted) или использовать Firefox Developer Edition / Nightly с `xpinstall.signatures.required = false`.
+
 > **Примечание:** MooDL0 автоматически заменит оригинальное расширение SyncShare, если оно установлено, так как оба используют одинаковые ключи Chrome. Весь функционал SyncShare сохраняется.
 
 ---

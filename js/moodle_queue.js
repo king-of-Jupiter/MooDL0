@@ -17,6 +17,48 @@
         await chrome.storage.local.set({ [KEY]: queue });
     }
 
+    const HISTORY_KEY = 'paramExtMoodleHistory';
+    const HISTORY_LIMIT = 200;
+
+    function tr(text, ...args) {
+        return self.ParamExtI18n ? self.ParamExtI18n.t(text, ...args) : text.replace(/\{(\d+)\}/g, (_, i) => args[i]);
+    }
+
+    async function addHistory(entry) {
+        try {
+            const stored = (await chrome.storage.local.get(HISTORY_KEY))[HISTORY_KEY];
+            const list = Array.isArray(stored) ? stored : [];
+            list.unshift(Object.assign({ at: Date.now() }, entry));
+            await chrome.storage.local.set({ [HISTORY_KEY]: list.slice(0, HISTORY_LIMIT) });
+        } catch (_) {
+            // History is informational only.
+        }
+    }
+
+    async function notify(title, message) {
+        try {
+            const settings = self.ParamExtSettings ? await self.ParamExtSettings.getSettings() : null;
+            if (settings && settings.moodle && settings.moodle.notifyQueue === false) {
+                return;
+            }
+            if (self.ParamExtI18n && settings) {
+                self.ParamExtI18n.setLanguage(settings.ui && settings.ui.language);
+            }
+            if (!chrome.notifications || typeof chrome.notifications.create !== 'function') {
+                return;
+            }
+            chrome.notifications.create('moodl0-queue-' + Date.now(), {
+                type: 'basic',
+                iconUrl: chrome.runtime.getURL('logo_main.png'),
+                title: tr(title),
+                // Built after the language is set, so it matches the UI setting.
+                message: typeof message === 'function' ? message() : String(message)
+            }, () => void chrome.runtime.lastError);
+        } catch (_) {
+            // Notifications are optional.
+        }
+    }
+
     function origin(url) {
         try {
             const parsed = new URL(url);
@@ -76,17 +118,28 @@
             return { ok: true };
         }
         if (message.type === 'MOODLE_QUEUE_ERROR') {
-            await save({ ...queue, active: false, error: String(message.error || 'Нужен ручной ввод.') });
+            const error = String(message.error || 'Нужен ручной ввод.');
+            await save({ ...queue, active: false, error });
+            await addHistory({ runId: queue.runId || null, url: queue.links[queue.index], index: queue.index,
+                total: queue.links.length, status: 'error', error });
+            await notify('MooDL0: очередь остановлена', () => tr('Тест {0} из {1}: {2}', queue.index + 1, queue.links.length, tr(error)));
             return { ok: true };
         }
         if (message.type === 'MOODLE_QUEUE_REVIEW' && queue.stage === 'submitted'
             && /\/mod\/quiz\/review\.php$/.test(path)
             && queue.attemptId && new URL(sender.url).searchParams.get('attempt') === queue.attemptId) {
+            const result = message.result && typeof message.result === 'object' ? message.result : {};
+            await addHistory({ runId: queue.runId || null, url: queue.links[queue.index], index: queue.index,
+                total: queue.links.length, status: 'done', attemptId: queue.attemptId,
+                grade: String(result.grade || '').slice(0, 120), name: String(result.name || '').slice(0, 160) });
             const index = queue.index + 1;
             const next = { ...queue, index, attemptId: null, stage: 'view',
                 launchToken: index < queue.links.length ? crypto.randomUUID() : null,
                 active: index < queue.links.length };
             await save(next);
+            if (!next.active) {
+                await notify('MooDL0: очередь завершена', () => tr('Пройдено тестов: {0}', queue.links.length));
+            }
             if (next.active) {
                 try {
                     const destination = new URL(queue.links[index]);
@@ -94,6 +147,8 @@
                     await chrome.tabs.update(queue.tabId, { url: destination.href });
                 } catch (error) {
                     await save({ ...next, active: false, error: String(error.message || error) });
+                    await addHistory({ runId: queue.runId || null, url: queue.links[index], index, total: queue.links.length,
+                        status: 'error', error: String(error.message || error) });
                     throw error;
                 }
             }

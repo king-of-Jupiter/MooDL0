@@ -16,7 +16,11 @@
 
     async function loadSettings() {
         if (window.ParamExtSettings) {
-            settings = { ...(await window.ParamExtSettings.getSettings()).moodle };
+            const all = await window.ParamExtSettings.getSettings();
+            settings = { ...all.moodle };
+            if (window.ParamExtI18n) {
+                window.ParamExtI18n.setLanguage(all.ui && all.ui.language);
+            }
         }
         try {
             const queue = await window.ParamExtMoodleQueue.request({ type: 'MOODLE_QUEUE_CONTEXT' });
@@ -147,10 +151,19 @@
         }
 
         if (settings.mode === 'autoSolve' && settings.autoSolving) {
-            const started = Date.now();
+            if (advanceScheduled) {
+                return;
+            }
+            advanceScheduled = true;
+            let started = 0;
             const advance = async () => {
+                hidePill();
                 if (!settings.autoSolving) {
+                    advanceScheduled = false;
                     return;
+                }
+                if (!started) {
+                    started = Date.now();
                 }
                 if (queueActive) {
                     const queue = await window.ParamExtMoodleQueue.request({ type: 'MOODLE_QUEUE_CONTEXT' }).catch(() => null);
@@ -167,8 +180,58 @@
                     window.ParamExtMoodleQueue.request({ type: 'MOODLE_QUEUE_ERROR', error: 'Ответ для текущей страницы не найден. Очередь остановлена.' });
                 }
             };
-            setTimeout(advance, 3500);
+            const min = Math.max(0, Number(settings.pageDelayMin) || 0);
+            const max = Math.max(min, Number(settings.pageDelayMax) || 0);
+            const extraMs = Math.round((min + Math.random() * (max - min)) * 1000);
+            const waitMs = 3500 + extraMs;
+            if (extraMs > 0) {
+                showCountdown(waitMs);
+            }
+            setTimeout(advance, waitMs);
         }
+    }
+
+    let advanceScheduled = false;
+    let pill = null;
+    let pillTimer = 0;
+
+    function tr(text, ...args) {
+        return window.ParamExtI18n ? window.ParamExtI18n.t(text, ...args) : text.replace(/\{(\d+)\}/g, (_, i) => args[i]);
+    }
+
+    function hidePill() {
+        clearInterval(pillTimer);
+        pillTimer = 0;
+        if (pill) {
+            pill.remove();
+            pill = null;
+        }
+    }
+
+    function showCountdown(totalMs) {
+        hidePill();
+        const until = Date.now() + totalMs;
+        pill = document.createElement('div');
+        pill.className = 'moodl0-pill';
+        pill.setAttribute('role', 'status');
+        const render = () => {
+            const left = Math.max(0, Math.ceil((until - Date.now()) / 1000));
+            if (pill) {
+                pill.textContent = tr('MooDL0: следующая страница через {0} с', left);
+            }
+        };
+        render();
+        document.body.appendChild(pill);
+        pillTimer = setInterval(render, 500);
+    }
+
+    function recordQuestionsOnPage() {
+        const assist = window.ParamExtAnswerAssist;
+        if (!assist || !/\/mod\/quiz\/attempt\.php$/.test(location.pathname)) {
+            return;
+        }
+        const numbers = Array.from(document.querySelectorAll('.que')).map((node) => assist.questionNumber(node));
+        assist.markSeen(numbers);
     }
 
     chrome.runtime.onMessage.addListener((message) => {
@@ -178,15 +241,13 @@
 
         if (message.type === 'SETTINGS_UPDATED') {
             if (message.settings && message.settings.moodle) {
-                settings = {
-                    mode: message.settings.moodle.mode,
-                    wandHotkey: message.settings.moodle.wandHotkey,
-                    insertHotkey: message.settings.moodle.insertHotkey,
-                    autoInsertOnLoad: message.settings.moodle.autoInsertOnLoad,
-                    nextButtonText: message.settings.moodle.nextButtonText,
+                settings = Object.assign({}, settings, message.settings.moodle, {
                     autoSolving: Boolean(message.settings.moodle.autoSolving),
                     autoFinishAttempt: Boolean(message.settings.moodle.autoFinishAttempt)
-                };
+                });
+                if (window.ParamExtI18n && message.settings.ui) {
+                    window.ParamExtI18n.setLanguage(message.settings.ui.language);
+                }
             } else if (message.settings) {
                 settings = {
                     mode: message.settings.mode || settings.mode,
@@ -238,6 +299,7 @@
     });
 
     await loadSettings();
+    recordQuestionsOnPage();
 
     if (window.ParamExtTelemetry) {
         window.ParamExtTelemetry.push('system_state', {
