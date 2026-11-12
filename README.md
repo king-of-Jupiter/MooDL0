@@ -51,15 +51,30 @@ npm run build:extension
 4. Выберите папку с файлами MooDL0 (где лежит `manifest.json`)
 5. Готово — иконка MooDL0 появится на панели расширений
 
-### Firefox (128+)
+### Firefox (140+)
 
-Сборка `npm run build:extension` создаёт также `dist/moodl0-extension-firefox.zip` (и распакованную папку `dist/firefox/`).
+**Обычная установка:** скачайте `moodl0-extension-firefox-<версия>.xpi` из [последнего релиза](https://github.com/king-of-Jupiter/MooDL0/releases/latest) и откройте его в Firefox. Подписанная версия ставится навсегда и сама обновляется из новых релизов.
+
+**Для разработки:** сборка `npm run build:extension` создаёт также `dist/moodl0-extension-firefox.zip` (и распакованную папку `dist/firefox/`).
 
 1. Откройте `about:debugging#/runtime/this-firefox`
 2. Нажмите **Загрузить временное дополнение…**
 3. Выберите `manifest.json` в папке `dist/firefox/` (или сам zip)
 
-Временное дополнение удаляется при перезапуске Firefox. Для постоянной установки zip нужно подписать через [addons.mozilla.org](https://addons.mozilla.org/developers/) (можно как unlisted) или использовать Firefox Developer Edition / Nightly с `xpinstall.signatures.required = false`.
+Временное дополнение удаляется при перезапуске Firefox.
+
+#### Подпись Firefox-версии
+
+Подпись идёт через addons.mozilla.org в канале **unlisted** (без публикации в каталоге). Нужны API-ключи: [Developer Hub → Manage API Keys](https://addons.mozilla.org/developers/addon/api/key/).
+
+- **В CI:** добавьте секреты репозитория `AMO_JWT_ISSUER` и `AMO_JWT_SECRET`. При выпуске релиза workflow подпишет сборку и приложит к релизу `.xpi` и `updates.json` (по нему Firefox находит обновления). Каждая версия подписывается один раз — для новой подписи поднимите `version` в `manifest.json`.
+- **Локально:**
+
+  ```bash
+  AMO_JWT_ISSUER=... AMO_JWT_SECRET=... npm run sign:firefox
+  ```
+
+  Результат — `dist/signed/moodl0-extension-firefox-<версия>.xpi` и `dist/signed/updates.json`. Чтобы работали автообновления, загрузите оба файла в GitHub-релиз `v<версия>`.
 
 > **Примечание:** MooDL0 автоматически заменит оригинальное расширение SyncShare, если оно установлено, так как оба используют одинаковые ключи Chrome. Весь функционал SyncShare сохраняется.
 

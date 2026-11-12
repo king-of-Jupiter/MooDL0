@@ -1,31 +1,15 @@
 import { createWriteStream } from 'node:fs';
-import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, rm } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { toFirefoxManifest } from './firefox-manifest.mjs';
+import { EXTENSION_FILES, FIREFOX_FILES, defaultUpdateUrl, repositoryUrlFromBuildConfig, stageFirefox } from './firefox-manifest.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const distDir = resolve(root, 'dist');
 const outZip = resolve(distDir, 'moodl0-extension.zip');
 const firefoxStage = resolve(distDir, 'firefox');
 const outFirefoxZip = resolve(distDir, 'moodl0-extension-firefox.zip');
-
-const include = [
-  'manifest.json',
-  '_locales',
-  'css',
-  'fonts',
-  'html',
-  'icons',
-  'js',
-  'scripts/update.sh',
-  'scripts/update.ps1',
-  'logo_main.png',
-  '74d85fb11d53487d88e3.png',
-  'LICENSE',
-  'README.md'
-];
 
 function zip(cwd, out, entries, logName) {
   return new Promise((resolvePromise, reject) => {
@@ -53,22 +37,13 @@ await rm(distDir, { recursive: true, force: true });
 await mkdir(distDir, { recursive: true });
 
 // Chrome / Chromium build.
-await zip(root, outZip, include, 'zip.log');
+await zip(root, outZip, EXTENSION_FILES, 'zip.log');
 console.log(`Built ${outZip}`);
 
 // Firefox build: same files, Gecko-flavoured manifest. The manifest must sit
 // at the zip root, so stage a copy and zip from inside it.
-await mkdir(firefoxStage, { recursive: true });
-for (const entry of include) {
-  if (entry === 'manifest.json') {
-    continue;
-  }
-  await cp(resolve(root, entry), resolve(firefoxStage, entry), { recursive: true });
-}
-const chromeManifest = JSON.parse(await readFile(resolve(root, 'manifest.json'), 'utf8'));
-await writeFile(
-  resolve(firefoxStage, 'manifest.json'),
-  JSON.stringify(toFirefoxManifest(chromeManifest), null, 2) + '\n'
-);
-await zip(firefoxStage, outFirefoxZip, include, 'zip-firefox.log');
+const repositoryUrl = process.env.REPOSITORY_URL || await repositoryUrlFromBuildConfig(root);
+const updateUrl = process.env.FIREFOX_UPDATE_URL || defaultUpdateUrl(repositoryUrl);
+await stageFirefox(root, firefoxStage, { updateUrl });
+await zip(firefoxStage, outFirefoxZip, FIREFOX_FILES, 'zip-firefox.log');
 console.log(`Built ${outFirefoxZip}`);

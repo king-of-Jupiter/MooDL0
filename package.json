@@ -6,7 +6,8 @@
     "test": "node -e \"console.log('no tests: Moodle-only build')\"",
     "build:config": "node scripts/generate-build-config.mjs",
     "build:extension": "npm run build:config && node scripts/build-extension.mjs",
-    "release:manifest": "node scripts/sign-release-manifest.mjs"
+    "release:manifest": "node scripts/sign-release-manifest.mjs",
+    "sign:firefox": "node scripts/sign-firefox.mjs"
   },
   "engines": {
     "node": ">=20"
