@@ -32,12 +32,12 @@
 
 ### Шаг 1: Скачайте расширение
 
-Откройте последний [**GitHub Release**](https://github.com/king-of-Jupiter/MooDL0/releases/latest) и скачайте `moodl0-extension.zip`. Распакуйте архив в удобное место.
+Откройте последний [**GitHub Release**](https://github.com/ccaaafresh/MooDL0/releases/latest) и скачайте `moodl0-extension.zip`. Распакуйте архив в удобное место.
 
 Для разработки можно клонировать репозиторий:
 
 ```bash
-git clone https://github.com/king-of-Jupiter/MooDL0.git
+git clone https://github.com/ccaaafresh/MooDL0.git
 cd MooDL0
 npm ci
 npm run build:extension
@@ -53,7 +53,7 @@ npm run build:extension
 
 ### Firefox (140+)
 
-**Обычная установка:** скачайте `moodl0-extension-firefox-<версия>.xpi` из [последнего релиза](https://github.com/king-of-Jupiter/MooDL0/releases/latest) и откройте его в Firefox. Подписанная версия ставится навсегда и сама обновляется из новых релизов.
+**Обычная установка:** скачайте `moodl0-extension-firefox-<версия>.xpi` из [последнего релиза](https://github.com/ccaaafresh/MooDL0/releases/latest) и откройте его в Firefox. Подписанная версия ставится навсегда и сама обновляется из новых релизов.
 
 **Для разработки:** сборка `npm run build:extension` создаёт также `dist/moodl0-extension-firefox.zip` (и распакованную папку `dist/firefox/`).
 
@@ -227,7 +227,7 @@ MooDL0/
 
 Если что-то не работает или есть идеи по улучшению — создайте issue в репозитории:
 
-**[GitHub Issues](https://github.com/king-of-Jupiter/MooDL0/issues)**
+**[GitHub Issues](https://github.com/ccaaafresh/MooDL0/issues)**
 
 Пожалуйста, опишите:
 - Что именно не работает

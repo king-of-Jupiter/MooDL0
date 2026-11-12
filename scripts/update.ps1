@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $RootDir = Resolve-Path (Join-Path $PSScriptRoot "..")
-$RepositoryUrl = if ($env:REPOSITORY_URL) { $env:REPOSITORY_URL } else { "https://github.com/king-of-Jupiter/MooDL0" }
+$RepositoryUrl = if ($env:REPOSITORY_URL) { $env:REPOSITORY_URL } else { "https://github.com/ccaaafresh/MooDL0" }
 $ArtifactName = if ($env:ARTIFACT_NAME) { $env:ARTIFACT_NAME } else { "moodl0-extension.zip" }
 $ApiUrl = ($RepositoryUrl -replace "https://github.com/", "https://api.github.com/repos/") + "/releases/latest"
 $TempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("moodl0-update-" + [System.Guid]::NewGuid().ToString("N"))

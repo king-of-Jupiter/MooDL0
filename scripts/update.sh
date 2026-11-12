@@ -3,7 +3,7 @@ set -eu
 
 ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 BUILD_CONFIG_REPOSITORY_URL="$(sed -n 's/.*"repositoryUrl"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$ROOT_DIR/js/build_config.js" 2>/dev/null | head -n 1)"
-REPOSITORY_URL="${REPOSITORY_URL:-${EXTENSION_REPOSITORY_URL:-${BUILD_CONFIG_REPOSITORY_URL:-https://github.com/king-of-Jupiter/MooDL0}}}"
+REPOSITORY_URL="${REPOSITORY_URL:-${EXTENSION_REPOSITORY_URL:-${BUILD_CONFIG_REPOSITORY_URL:-https://github.com/ccaaafresh/MooDL0}}}"
 ARTIFACT_NAME="${ARTIFACT_NAME:-moodl0-extension.zip}"
 
 cd "$ROOT_DIR"

@@ -16,7 +16,7 @@ const config = {
   telegramChannelLink: env('TELEGRAM_CHANNEL_LINK', 'https://t.me/moodl0_news'),
   repositoryUrl: env('REPOSITORY_URL', env('GITHUB_SERVER_URL') && env('GITHUB_REPOSITORY')
     ? `${env('GITHUB_SERVER_URL')}/${env('GITHUB_REPOSITORY')}`
-    : 'https://github.com/king-of-Jupiter/MooDL0'),
+    : 'https://github.com/ccaaafresh/MooDL0'),
   updateCheckUrl: env('UPDATE_CHECK_URL', ''),
   buildChannel: env('BUILD_CHANNEL', env('GITHUB_ACTIONS') ? (env('GITHUB_REF_TYPE') === 'tag' ? 'stable' : 'dev') : 'local'),
   buildId: env('BUILD_ID', env('GITHUB_SHA', 'local-dev')),
